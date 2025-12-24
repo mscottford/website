@@ -1,6 +1,9 @@
+import { withContentCollections } from '@content-collections/next'
 import rehypePrism from '@mapbox/rehype-prism'
 import nextMDX from '@next/mdx'
+import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 
 const staticExportOptions = 
   process.env.STATIC_EXPORT === 'true' ? {
@@ -13,7 +16,7 @@ const staticExportOptions =
 const nextConfig = {
   ...staticExportOptions,
 
-  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
+  pageExtensions: ['js', 'jsx', 'md', 'mdx','ts', 'tsx'],
   outputFileTracingIncludes: {
     '/articles/*': ['./src/app/articles/**/*.mdx'],
   },
@@ -22,9 +25,9 @@ const nextConfig = {
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
+    remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter],
     rehypePlugins: [rehypePrism],
   },
 })
 
-export default withMDX(nextConfig)
+export default withContentCollections(withMDX(nextConfig))
