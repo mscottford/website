@@ -1,20 +1,25 @@
 import assert from 'assert'
 import * as cheerio from 'cheerio'
+import { allPosts } from 'content-collections'
 import { Feed } from 'feed'
 
+export const dynamic = 'force-static'
+
 export async function GET(req: Request) {
+  const ReactDOMServer = (await import('react-dom/server')).default;
+
   let siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 
   if (!siteUrl) {
     throw Error('Missing NEXT_PUBLIC_SITE_URL environment variable')
   }
 
-  let author = {
-    name: 'Spencer Sharp',
-    email: 'spencer@planetaria.tech',
+  const author = {
+    name: 'M. Scott Ford',
+    email: 'scott@mscottford.com',
   }
 
-  let feed = new Feed({
+  const feed = new Feed({
     title: author.name,
     description: 'Your blog description',
     author,
@@ -28,39 +33,31 @@ export async function GET(req: Request) {
     },
   })
 
-  let articleIds = require
-    .context('../articles', true, /\/page\.mdx$/)
-    .keys()
-    .filter((key) => key.startsWith('./'))
-    .map((key) => key.slice(2).replace(/\/page\.mdx$/, ''))
+  const sortedPosts = allPosts
+    .sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    });
 
-  for (let id of articleIds) {
-    let url = String(new URL(`/articles/${id}`, req.url))
-    let html = await (await fetch(url)).text()
-    let $ = cheerio.load(html)
+  for (const post of sortedPosts) {
+    const publicUrl = `${siteUrl}/articles/${post.slug}`;
 
-    let publicUrl = `${siteUrl}/articles/${id}`
-    let article = $('article').first()
-    let title = article.find('h1').first().text()
-    let date = article.find('time').first().attr('datetime')
-    let content = article.find('[data-mdx-content]').first().html()
+    const { default: Content } = await import(`../../../content/posts/${post._meta.filePath}`);
 
-    assert(typeof title === 'string')
-    assert(typeof date === 'string')
-    assert(typeof content === 'string')
+    const renderedContent = ReactDOMServer.renderToStaticMarkup(Content(), { identifierPrefix: `post-${post.slug}-` });
 
     feed.addItem({
-      title,
+      title: post.title,
       id: publicUrl,
       link: publicUrl,
-      content,
+      description: post.description,
+      content: renderedContent,
+      date: new Date(post.createdAt),
       author: [author],
       contributor: [author],
-      date: new Date(date),
-    })
+    });
   }
 
-  return new Response(feed.rss2(), {
+  return new Response(feed.atom1(), {
     status: 200,
     headers: {
       'content-type': 'application/xml',
