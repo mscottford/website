@@ -2,9 +2,14 @@
   "name": "mscottford-website",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
+    "predev": "pnpm run build:favicons",
     "dev": "next dev",
+    "prebuild": "pnpm run build:favicons",
     "build": "next build",
+    "build:favicons": "ts-node --esm ./scripts/generate-favicons/index.ts",
+    "prestart": "pnpm run build:favicons",
     "start": "next start",
     "lint": "next lint"
   },
@@ -38,11 +43,13 @@
     "@types/react-dom": "^19",
     "eslint": "^9.32.0",
     "eslint-config-next": "^15",
+    "favicons": "^7.2.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx-frontmatter": "^5.2.0",
     "sharp": "0.34.3",
+    "ts-node": "^10.9.2",
     "zod": "^4.2.1"
   }
 }

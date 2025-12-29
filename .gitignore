@@ -40,3 +40,7 @@ next-env.d.ts
 
 # Content Collections
 .content-collections
+
+src/app/apple-icon*.png
+src/app/icon*.png
+src/app/favicon.ico
