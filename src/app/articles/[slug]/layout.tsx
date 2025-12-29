@@ -19,10 +19,8 @@ function ArrowLeftIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 }
 
 export default function ArticleLayout({
-  article,
   children,
 }: {
-  article: Post
   children: React.ReactNode
 }) {
   const previousPathname = false;
