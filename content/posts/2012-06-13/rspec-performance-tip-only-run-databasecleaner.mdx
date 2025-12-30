@@ -1,0 +1,68 @@
+---
+title: "rspec performance tip: only run DatabaseCleaner when needed"
+description: "I have a rspec performance tip to share. Before you get all excited you should take a little test to see if it will work for you."
+dateTime: "2012-06-13T17:38:00.000Z"
+tumblrId: "25031162345"
+tumblrSlug: "rspec-performance-tip-only-run-databasecleaner"
+---
+
+I have a rspec performance tip to share. Before you get all excited you should take a little test to see if it will work for you.
+
+1.  Are you using rspec 2?
+2.  Are you using DatabaseCleaner (or something similar)?
+3.  Do you have some tests that don’t touch the database?
+
+If you answered yes to all of those questions, then you probably have something similar to this block in your `spec_helper.rb`.
+
+```
+config.before(:each) do
+  DatabaseCleaner.start
+end
+
+config.after(:each) do
+  DatabaseCleaner.clean
+end
+```
+
+I’m guessing that most of us just copy and paste this when it’s needed in order to get Capybara request specs working correctly. The trouble is, these before and after blocks will apply to all of your tests that don’t need database access.
+
+The trick is to only perform these statements when needed. Here’s how.
+
+Update your `rspec_helper.rb` file to look more like this.
+
+```
+config.before(:each) do
+  DatabaseCleaner.start if example.metadata[:db]
+end
+
+config.after(:each) do
+  DatabaseCleaner.clean if example.metadata[:db]
+end
+```
+
+Then run your test suite. You should notice some failures that weren’t there before. Those are the specs that need the database in a known state before they run. You need to add the `:db => true` metadata to those specs.
+
+There are a couple ways to do that. You can do it to a single spec with
+
+```
+it 'should have a clean db', :db => true do
+end
+```
+
+Or you can add it to an entire context with
+
+```
+context 'uses the database', :db => true do
+  it 'should have a clean db' do
+  end
+end
+```
+
+And you can even add the metadata to a `describe` block with
+
+```
+describe AwesomeModel, :db => true do
+end
+```
+
+Enjoy!

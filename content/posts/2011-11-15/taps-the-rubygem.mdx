@@ -1,0 +1,67 @@
+---
+title: "taps, the rubygem"
+description: "What's taps?"
+dateTime: "2011-11-15T15:51:37.000Z"
+tumblrId: "12837963246"
+tumblrSlug: "taps-the-rubygem"
+---
+
+**What’s taps?**
+
+[Taps](https://github.com/ricardochimal/taps "taps, the rubygem") is a rubygem that just may become your new best friend. I know it’s mine, but I get knew best friends all the time. At least when those friends are rubygems…… \*awkward silence\*…. Okay. Moving on.
+
+Before I tell you about the awesomeness that is taps, let me explain how I found it.
+
+Last week I noticed a neat Heroku command that I had not used before, `heroku db:pull`.
+
+This command will let you grab your app’s database and pull it down to your development instance.
+
+**That’s pretty cool, but what if I’m not using Heroku?**
+
+Well that’s where the awesomeness that is taps comes into play.
+
+Taps is the rubygem behind the scenes of the heroku db:pull command, and you can use it without using Heroku.
+
+**Okay, great. Why would I use it?**
+
+Here’s the scenario that I just ran into. The production version of my app is throwing an exception, and I’m not sure exactly what’s causing the problem. I’ve glanced at the logs, but the error is a little cryptic. Finding and fixing the issue is going to take the kind of experimentation that I’d normally not perform in the production environment. With taps, I can pull down the production server’s database on to my local development environment, where I can poke and prod at the problem all I want without having to worry about breaking anything else.
+
+**I don’t think that’ll work for me. My app uses mysql (or postgres), and I only use sqlite (anything else) for local development. Is there anything similar that will work for me?**
+
+You are in luck, dear reader. Taps is database agnostic. That’s right! I can pull from a remote mysql server and have the schema and data stored locally in sqlite, postgress or …. Well, I’m honestly not sure what else it supports, but I have used it with postgress, mysql and sqlite.
+
+**Ooooh! Shiny. How do I use it?**
+
+You need to install the taps gem in both the source system and the target system. This is because taps comes with both a client and a server. The client will run in your development environment, and the server will run on, well, your server, or anywhere else that can connect to your production database.\[1\]
+
+On your production server, start taps with a command that looks like this:
+
+For mysql:
+
+```
+taps server mysql://dbuser:dbpassword@localhost/dbname tapsuser tapspassword
+```
+
+Or for postgres:
+
+```
+taps server postgress://dbuser:dbpassword@localhost/dbname tapsuser tapspassword
+```
+
+There are a few more options that you can specify, so if you’re worried that the defaults don’t meet your needs, then check out the [readme](https://github.com/ricardochimal/taps/blob/master/README.rdoc "taps readme file") file.
+
+That’ll boot the server on port 5000. It runs with http authentication using the username and password that you specified on the command line. In my example above, that’s `tapsuser` and `tapspassword`. Inventive, I know.
+
+Now you can use the client to pull the production database down to your development environment. Here’s what it looks like if you’re using sqlite for development.
+
+```
+taps pull sqlite://db/production_copy.sqlite3 http://tapsuser:tapspassword@production.server.com:5000
+```
+
+I recommend pulling the data down into a file other than you’re `development.sqlite3` file. That way, if you have anything important in your development database it won’t get wiped out by this process. I like to rename the `development.sqlite3` file to something like `development.sqlite3.snapshot1`. That way I can use that data for comparison during my bug investigation.
+
+**Is that it?**
+
+Yep. It’s that simple. I hope you enjoy using taps. And remember, you don’t have to be a ruby fanboy to use this tool. Any project that has different databases in different locations should benefit from using this tool.
+
+\[1\]: I’m making an assumption that you don’t have direct remote access to your production database from your development environment. If you happen to have such access, then I hope you know what you’re doing in setting it up that way. Security concerns aside, you can run both the taps server and the taps client in your development environment. You just have to modify database connection url to not use localhost.

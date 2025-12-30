@@ -1,0 +1,17 @@
+---
+title: "Monkey patching away default_scope"
+description: "I was recently working on a Spree store that needed to remove a default scope that was created by an extension. Lots of Google searching did not yield an ans..."
+dateTime: "2012-12-11T14:08:29.000Z"
+tumblrId: "37712903520"
+tumblrSlug: "monkey-patching-away-defaultscope"
+---
+
+I was recently working on a Spree store that needed to remove a default scope that was created by an extension. Lots of Google searching did not yield an answer, so I dove into the ActiveRecord source to figure out how `default_scope` was implemented. It turns out that the default scope is stored as an array in a class variable `default_scopes`. So removing the default scope was as simple as
+
+```
+Spree::User.class_eval do
+  self.default_scopes = []
+end
+```
+
+I’m sure this depends on ensuring that this code executes after any default scopes have been created, so that’s something to check if you try this out and find that it does not work.

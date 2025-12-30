@@ -1,0 +1,27 @@
+---
+title: "Does Your Team Prevent You From Refactoring?"
+description: "There was a good discussion during yesterday's Legacy Code Rocks virtual meetup. It centered around coping with teams that actively prevent refactoring. The ..."
+dateTime: "2019-10-03T15:04:24.000Z"
+tumblrId: "188107128706"
+tumblrSlug: "does-your-team-prevent-you-from-refactoring"
+---
+
+# Does Your Team Prevent You From Refactoring?
+
+There was a good discussion during yesterday’s [Legacy Code Rocks virtual meetup](https://t.umblr.com/redirect?z=https%3A%2F%2Fwww.legacycode.rocks%2Fcommunity&t=OGMxMzIyY2I1ZDkyYzRiYzNlNTFmYTU0YzYwOWNlNDg3ODY0MmQwNiw0ZDE1YTE0MjBjY2EwMjMzMDlmZmNjZmM3YWVjMDIzNjY1Zjg5ZDI0). It centered around coping with teams that actively prevent refactoring. The specific example that was presented is as follows.
+
+Daniel was chatting about a chunk of code with one of his co-workers. That co-worker was reading it, and Daniel noticed that they had interpreted the meaning of the variable name incorrectly. Daniel agreed that the variable name was a little ambiguous, but he knew the correct meaning because he was the original author of the code. He opened up a pull request to change the name so that the intention was more clear, but a more senior member of the team rejected the change. The reasoning that Daniel related from the more senior team member was “when I learn how the code works, I don’t like for the names to change, because it makes things more confusing”.
+
+We chatted as a group about other objections to refactoring that we’ve encountered. I personally have encountered many over the years, but most of those objections were the result of larger structural changes that I wanted to apply. This is the first time that I’ve ever heard of someone very clearly rejecting the simple changing of a variable name.
+
+I’m curious if there are others out there who have encountered this sentiment, and I’m especially curious about how they’ve dealt with it.
+
+I used to encounter resistance to refactoring all the time, but since starting Corgibytes, I don’t come across it as often. I’m guessing that’s because most of the companies that approach us for help have already decided that they want some help cleaning up their code and that inevitably involves a little bit of refactoring.
+
+The discussion that we had during the meetup went into different nuances and the different reasons for why a team might want to avoid certain types of refactorings. Here’s a brief list that we came up with:
+
+*   Name changes are riskier in dynamic languages (in compiled languages the compiler is more likely to detect an issue early, the only exception being names that are used via reflection or names that are part of a public library API)
+*   Formatting changes can make it hard to read when diffing across the boundary created by the commit which includes the formatting change (even when the formatting changes are isolated to a single commit, this can still be an issue sometimes)
+*   Refactoring without adequate test coverage is risky (even when you’re relying on an automated refactoring tool, there’s still a very slim chance that the refactoring will have an unintended side effect. On teams that are very risk-averse, this objection might come up more often.)
+
+I’d love to keep the conversation going in the comments. Has anyone else encountered this issue? How have you dealt with it?

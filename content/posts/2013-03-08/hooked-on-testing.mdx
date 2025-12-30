@@ -1,0 +1,45 @@
+---
+title: "Hooked on Testing"
+description: "I’ve been approached by developers for years that have asked me to help them become better testers. In the past, I’ve focused my efforts on the different too..."
+dateTime: "2013-03-08T04:22:26.000Z"
+tumblrId: "44838584540"
+tumblrSlug: "hooked-on-testing"
+---
+
+I’ve been approached by developers for years that have asked me to help them become better testers. In the past, I’ve focused my efforts on the different tools that are available and how to use those tools to write different kinds of tests. I’d spend lots of time talking about different kinds of tests, such as unit tests, integration tests, functional tests, and acceptance tests. I’d define the different characteristics of each kind of test and the different ways to use each test to detect a particular problem. I’d even talk about employing test driven development (TDD) to slowly build up a suite of tests while writing your code. I’d talk about all of the different benefits of having tests. I’d explain how much safer it is to refactor, how much less stressful deployments are. I’d talk about employing continuous integration to make sure that the test suite works in more than one environment and to make it easy to figure out which team member is responsible to for introducing a test failure.
+
+After talking for hours upon hours, either in one on one sessions, brown bag lunch presentations, or in larger internal training meetings, I’d walk away thinking I’d made an impact. I’d taught people how to test. The source code around them was going to slowly get much better. They were going to ship fewer bugs. They were going to be able to refactor without fear. After all, these are all things that happened to me after I started testing. But that’s not what happened for them.
+
+I’d chat with these developers later to learn that they were still struggling with testing. They were still asking me questions like: \* How do I test? \* What do I test? \* How often should I test? \* What should I test?
+
+I’d remind them of all the useful information that I’d provided in the past, but that’s when a glazed look would set in. I’d lost them.
+
+For a while, I thought that people just weren’t getting it. I thought they didn’t see the value of testing, because they had yet to experience the pain that is caused by not testing. So, based on advice from a Kent Beck talk, I started waiting for teachable moments, times when a developer would come to me saying something like this:
+
+> Hey, this method doesn’t work correctly when null is passed in, but I can’t figure out how to make the app pass that in. I’ve been poking at it with a conditional breakpoint set, and I just can’t make it happen. The user sent us an error message that’s suggests that a null reference is what’s causing this problem to occur. I’m stuck, you got a second?
+
+And then I would swoop in and write a test that calls that method and passes it null. It would fail, and we’d compare the error message with the one the user sent in. We’d figure out the best way to handle null, and then we’d close the ticket. The bug would be fixed, and another co-worker would see the value of testing. Awesome!
+
+The only trouble is that only ever happened once, sometime after I fell asleep, but before I woke up again. Sigh.
+
+I never found that teachable moment, but I’m still encountering people that want to learn how to test. It seems like I encounter at least one such person on every team that I join.
+
+So many developers have asked me to teach them to test. I’ve tried many different responses. Over time, I’ve seen a pattern emerge that I was totally missing before, because of an assumption that I was making.
+
+All these people already knew the value of testing. They’d read books, skimmed blog articles, watched screencasts, attended conference talks. They already got it.
+
+I didn’t need to teach these people why to test. They already knew the mechanics. They’d played with different testing tools. They’d written different kinds of tests. That part they were comfortable with already.
+
+I didn’t even really need to teach them how to test. They already knew that, too. They knew the different tricks for making sure the test is actually executing the code that they thought it was. They knew when to use an acceptance test and when to use a unit test.
+
+I didn’t need to teach them those things. What they were struggling with was how to keep testing. How to make it part of their routine. How to fight feeling like they were writing twice as much code and getting half as much done. How to keep from having to rewrite the entire test suite when something small changes. How to keep from testing frivolous things.
+
+Then it dawned on me. What they were really missing was making testing a habit, a second nature impulse, something that seemed wrong to skip, something that they would crave to do when solving a problem.
+
+So I’ve decided to write a book. The working title is “Hooked on Testing”. The book’s goal is turn developers into testing addicts.
+
+If that sounds like something that interests you, please [sign up](https://leanpub.com/hooked-on-testing) to be notified when the first chunk is published.
+
+The book will be available for purchase before its completed. This will let me collect feedback on it as I’m writing, and it’ll let you get early access to the content if you’re interested.
+
+I’ll also be posting excerpts on my blog, so stay tuned.

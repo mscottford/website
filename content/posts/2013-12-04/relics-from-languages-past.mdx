@@ -1,0 +1,78 @@
+---
+title: "Relics from Languages Past"
+description: "My first “real” development gig, way back in the summer of 2000, was working on a desktop application that was written in Delphi. I’d taken Pascal in high sc..."
+dateTime: "2013-12-04T03:48:00.000Z"
+tumblrId: "68945201319"
+tumblrSlug: "relics-from-languages-past"
+---
+
+My first “real” development gig, way back in the summer of 2000, was working on a desktop application that was written in Delphi. I’d taken Pascal in high school, and I’d done some pretty cool experiments with Object Pascal. I’m sure that shortened the learning curve significantly. But there was one stylistic rule on the team that forced me to change the way I wrote functions.
+
+In Delphi, functions had an implicitly defined variable named `result` that was to become the return value when the function terminated without exceptions. Functions could terminate without exceptions in two ways, either by reaching the end of execution naturally, or by encountering an explicit call to `exit`. Explicit calls to `exit` were not permitted by the project’s style guide, under the justification that all procedures and functions should have one entry point and one exit point, allowing for _exceptions_ which were the only exception to the rule. (Holy overloaded terms, Batman!)
+
+This meant that I wrote a **ton** of code that looked something like this.
+
+```
+function Lookup(search: String): TExample
+begin
+  result := Null;
+
+  if search = 'trivial' then
+    result := TExample.Create;
+  end
+end
+```
+
+I remember finding this to be a crazy annoying restriction when I was first presented with it. I found it doubly weird that it was basically enforced by the language. In my university computer science program, we used C/C++, and I had developed a personal style that looked more like this.
+
+```
+Example* Lookup(string search) {
+  if (search == 'trivial') {
+    return new Example();
+  }
+
+  return null;
+}
+```
+
+After a couple of months, I found myself writing C++ code that looked something like this instead.
+
+```
+Example* Lookup(string search) {
+  Example* result = null;
+
+  if (search == 'trivial') {
+    result = new Example();
+  }
+
+  return result;
+}
+```
+
+And ever since, that style has stuck with me. I used it when I wrote C#, Java, PHP and more. Even (_gasp_) Ruby. Idiomatic Ruby would probably look something like this.
+
+```
+def lookup(value)
+  if value == 'trivial'
+    Example.new
+  end
+end
+```
+
+But I still find myself wanting to write this instead.
+
+```
+def lookup(value)
+  result = nil
+
+  if value == 'trivial'
+    result = Example.new
+  end
+
+  result
+end
+```
+
+That’s a lot of extra typing, and it’s still really hard to turn that habit off. It seems to be really deep in there. In the first version, I find myself wondering what the return value is actually going to be. Is it going to be `nil`? Or is it going to be `false` because the if condition failed. The answer is pretty easy to figure out. And you’d think that after nearly 5 years of working with ruby, I wouldn’t still struggle with this, but I do.
+
+I’m curious if anyone else is fighting styles that they learned from other languages. I’ve heard a lot of anecdotal complaints about people reading “ruby code that looks like Java”, but I’d love to hear the perspective of someone that’s probably written code that meets that description.
