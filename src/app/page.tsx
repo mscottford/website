@@ -9,7 +9,7 @@ import {
   GitHubIcon,
   InstagramIcon,
   LinkedInIcon,
-  XIcon,
+  MastodonIcon,
 } from '@/components/SocialIcons'
 import logoAirbnb from '@/images/logos/airbnb.svg'
 import logoFacebook from '@/images/logos/facebook.svg'
@@ -277,28 +277,31 @@ export default async function Home() {
       <Container className="mt-9">
         <div className="max-w-2xl">
           <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
-            Software designer, founder, and amateur astronaut.
+            Software mender, legacy code whisperer, speaker, instructor.
           </h1>
           <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-            I’m Spencer, a software designer and entrepreneur based in New York
-            City. I’m the founder and CEO of Planetaria, where we develop
-            technologies that empower regular people to explore space on their
-            own terms.
+            I’m Scott, a software engineer with a passion for improving and
+            maintaining existing codebases. With over a decade of experience, I
+            specialize in wrangling legacy systems to enhance scalability,
+            stability, and sustainability. When I’m not coding, you’ll find me
+            sharing my knowledge in various formats, including the{' '}
+            {/* TODO: This link isn't showing up as underlined. */}
+            <Link href="https://legacycode.rocks">Legacy Code Rocks</Link>{' '}
+            community/podcast, conference talks, and on this site.
           </p>
           <div className="mt-6 flex gap-6">
-            <SocialLink href="#" aria-label="Follow on X" icon={XIcon} />
             <SocialLink
-              href="#"
-              aria-label="Follow on Instagram"
-              icon={InstagramIcon}
+              href="https://toot.legacycode.rocks/@mscottford"
+              aria-label="Follow on Mastodon"
+              icon={MastodonIcon}
             />
             <SocialLink
-              href="#"
+              href="https://github.com/mscottford"
               aria-label="Follow on GitHub"
               icon={GitHubIcon}
             />
             <SocialLink
-              href="#"
+              href="https://linkedin.com/in/mscottford"
               aria-label="Follow on LinkedIn"
               icon={LinkedInIcon}
             />
@@ -313,8 +316,7 @@ export default async function Home() {
               <Article key={article.slug} article={article} />
             ))}
           </div>
-          <div className="space-y-10 lg:pl-16 xl:pl-24">
-            <Newsletter />
+          <div className="space-y-10 lg:pl-8 xl:pl-24">
             <Resume />
           </div>
         </div>
