@@ -212,7 +212,7 @@ function AvatarContainer({
     <div
       className={clsx(
         className,
-        'h-10 w-10 rounded-full bg-white/90 p-0.5 shadow-lg ring-1 shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:ring-white/10',
+        'rounded-full bg-white/90 p-0.5 shadow-lg ring-1 shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:ring-white/10',
       )}
       {...props}
     />
@@ -222,6 +222,7 @@ function AvatarContainer({
 function Avatar({
   large = false,
   className,
+  children,
   ...props
 }: Omit<React.ComponentPropsWithoutRef<typeof Link>, 'href'> & {
   large?: boolean
@@ -238,11 +239,12 @@ function Avatar({
         alt=""
         sizes={large ? '4rem' : '2.25rem'}
         className={clsx(
-          'rounded-full bg-zinc-100 object-cover dark:bg-zinc-800',
+          'inline rounded-full bg-zinc-100 object-cover dark:bg-zinc-800',
           large ? 'h-16 w-16' : 'h-9 w-9',
         )}
         priority
       />
+      {children}
     </Link>
   )
 }
@@ -383,19 +385,30 @@ export function Header() {
                     'var(--header-inner-position)' as React.CSSProperties['position'],
                 }}
               >
-                <div className="relative">
+                <div
+                  className="relative"
+                  // style={{ transform: 'var(--avatar-image-transform)' }}
+                >
                   <AvatarContainer
-                    className="absolute top-3 left-0 origin-left transition-opacity"
+                    className="inline-block origin-left"
+                    // className="h-16 origin-left"
                     style={{
-                      opacity: 'var(--avatar-border-opacity, 0)',
-                      transform: 'var(--avatar-border-transform)',
+                      transform: 'var(--avatar-image-transform)',
                     }}
-                  />
-                  <Avatar
-                    large
-                    className="block h-16 w-16 origin-left"
-                    style={{ transform: 'var(--avatar-image-transform)' }}
-                  />
+                    // style={{
+                    //   opacity: 'var(--avatar-border-opacity, 0)',
+                    //   transform: 'var(--avatar-border-transform)',
+                    // }}
+                  >
+                    <Avatar
+                      large
+                      // style={{ transform: 'var(--avatar-image-transform)' }}
+                    >
+                      <span className="m-2 px-3 py-2 align-middle text-3xl">
+                        M. Scott Ford
+                      </span>
+                    </Avatar>
+                  </AvatarContainer>
                 </div>
               </div>
             </Container>
@@ -420,7 +433,11 @@ export function Header() {
               <div className="flex flex-1">
                 {!isHomePage && (
                   <AvatarContainer>
-                    <Avatar />
+                    <Avatar>
+                      <span className="m-2 px-3 py-2 align-middle text-sm font-medium">
+                        M. Scott Ford
+                      </span>
+                    </Avatar>
                   </AvatarContainer>
                 )}
               </div>
