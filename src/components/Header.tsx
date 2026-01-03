@@ -220,12 +220,10 @@ function AvatarContainer({
 }
 
 function Avatar({
-  large = false,
   label = undefined,
   className,
   ...props
 }: Omit<React.ComponentPropsWithoutRef<typeof Link>, 'href'> & {
-  large?: boolean,
   label?: string
 }) {
   return (
@@ -238,11 +236,8 @@ function Avatar({
       <Image
         src={avatarImage}
         alt=""
-        sizes={large ? '4rem' : '2.25rem'}
-        className={clsx(
-          'inline rounded-full bg-zinc-100 object-cover dark:bg-zinc-800',
-          large ? 'h-16 w-16' : 'h-9 w-9',
-        )}
+        sizes="2.25rem"
+        className='inline h-9 w-9 rounded-full bg-zinc-100 object-cover dark:bg-zinc-800'
         priority
       />
       {label && (
