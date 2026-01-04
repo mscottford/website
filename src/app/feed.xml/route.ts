@@ -33,7 +33,11 @@ export async function GET(req: Request) {
     },
   })
 
+  // Filter out old imported posts (before 2024) to avoid flooding RSS subscribers
+  const feedCutoffDate = new Date('2024-01-01T00:00:00Z')
+
   const sortedPosts = allPosts
+    .filter((post) => new Date(post.createdAt) >= feedCutoffDate)
     .sort((a, b) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     });
@@ -41,13 +45,18 @@ export async function GET(req: Request) {
   for (const post of sortedPosts) {
     const publicUrl = `${siteUrl}/articles/${post.slug}`;
 
+    // Use tumblrId as GUID for imported posts to preserve RSS subscriber state
+    const itemId = post.tumblrId
+      ? `https://mscottford.com/post/${post.tumblrId}`
+      : publicUrl;
+
     const { default: Content } = await import(`../../../content/posts/${post._meta.filePath}`);
 
     const renderedContent = ReactDOMServer.renderToStaticMarkup(Content(), { identifierPrefix: `post-${post.slug}-` });
 
     feed.addItem({
       title: post.title,
-      id: publicUrl,
+      id: itemId,
       link: publicUrl,
       description: post.description,
       content: renderedContent,
