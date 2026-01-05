@@ -5,6 +5,8 @@ import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 
+const __dirname = new URL('.', import.meta.url).pathname;
+
 const staticExportOptions =
   process.env.STATIC_EXPORT !== 'false'
     ? {
@@ -21,10 +23,15 @@ const staticExportOptions =
 const nextConfig = {
   ...staticExportOptions,
 
-  pageExtensions: ['js', 'jsx', 'md', 'mdx','ts', 'tsx'],
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   outputFileTracingIncludes: {
     '/articles/*': ['./src/app/articles/**/*.mdx'],
   },
+
+  turbopack: {
+    root: __dirname,
+  },
+  outputFileTracingRoot: __dirname,
 }
 
 const withMDX = nextMDX({
