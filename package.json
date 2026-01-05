@@ -31,6 +31,8 @@
     "typescript": "^5.8.3"
   },
   "devDependencies": {
+    "@content-collections/core": "^0.13.0",
+    "@content-collections/next": "^0.2.10",
     "@types/node": "^24.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -38,6 +40,9 @@
     "eslint-config-next": "^15",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
-    "sharp": "0.34.3"
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx-frontmatter": "^5.2.0",
+    "sharp": "0.34.3",
+    "zod": "^4.2.1"
   }
 }
