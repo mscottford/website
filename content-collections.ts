@@ -40,6 +40,35 @@ const posts = defineCollection({
   }
 });
 
+const socialLinks = defineCollection({
+  name: 'socialLinks',
+  directory: './content/social-links',
+  include: '**/*.yaml',
+  parser: 'yaml',
+  schema: z.object({
+    platform: z.string(),
+    url: z.url(),
+    alt: z.string(),
+  }),
+  transform: async ({ ...link }) => {
+    return {
+      ...link,
+      slug: link.platform.toLowerCase().replace(/ /g, "-"),
+    }
+  }
+});
+
+const navItems = defineCollection({
+  name: 'navItems',
+  directory: './content/nav-items',
+  include: '**/*.yaml',
+  parser: 'yaml',
+  schema: z.object({
+    label: z.string(),
+    href: z.string(),
+  }),
+});
+
 export default defineConfig({
-  collections: [posts],
+  collections: [posts, socialLinks, navItems],
 });

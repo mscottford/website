@@ -181,7 +181,7 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
     return (
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
     );
   }
@@ -450,10 +450,10 @@ This section tracks placeholder content from the Tailwind UI Spotlight template 
 ### Pages
 
 - [ ] `src/app/page.tsx` - Homepage
-  - [ ] Tagline ("Software designer, founder, and amateur astronaut")
-  - [ ] Bio paragraph mentioning "Spencer" and "Planetaria"
+  - [x] Tagline ("Software designer, founder, and amateur astronaut")
+  - [x] Bio paragraph mentioning "Spencer" and "Planetaria"
   - [ ] Resume section (Planetaria, Airbnb, Facebook, Starbucks positions)
-  - [ ] Social media links (all `href="#"`)
+  - [x] Social media links (all `href="#"`)
   - [ ] "Download CV" button link
 
 - [ ] `src/app/about/page.tsx` - About page
