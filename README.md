@@ -1,6 +1,6 @@
 # M. Scott Ford - Personal Website
 
-This is the source code for my personal website, [mscottord.com](https://mscottord.com). It is built using Next.js.
+This is the source code for my personal website, [mscottford.com](https://mscottford.com). It is built using Next.js.
 
 ## License
 
