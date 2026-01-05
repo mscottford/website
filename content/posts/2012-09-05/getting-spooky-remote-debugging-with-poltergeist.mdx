@@ -1,0 +1,43 @@
+---
+title: "Getting spooky: remote debugging with poltergeist on Mac OS X"
+description: "I've been working on switching our project over to use poltergeist, a phantomjs backed capybara driver, for headless browser tests. I had a couple of specs f..."
+dateTime: "2012-09-05T02:24:38.000Z"
+tumblrId: "30910962407"
+tumblrSlug: "getting-spooky-remote-debugging-with-poltergeist"
+---
+
+I’ve been working on switching our project over to use [poltergeist](https://github.com/jonleighton/poltergeist), a [phantomjs](http://phantomjs.org/) backed [capybara](https://github.com/jnicklas/capybara#poltergeist) driver, for headless browser tests. I had a couple of specs fail, and started to look into what was causing the failures. I quickly realized that I was going to need more power than looking at screenshots taken with `page.driver.render('/path/to/screenshot', :full => true)`.
+
+I saw that remote debugging was [supposed to work on Mac OS X](https://github.com/jonleighton/poltergeist/issues/110) with phantomjs version 1.6.1+, but I found I needed to jump through some hoops to get it working. Here are the steps that I went through.
+
+## Create a shell script to launch Google Chrome (or your favorite WebKit browser)
+
+Poltergeist is configured with an executable that wil launch a browser. I had trouble running `/Application/Google Chrome.app/Contents/MacOS/Google Chrome`, so I had to create a shell script that invokes `open /Applications/Google Chrome.app`. Here’s what it looks like.
+
+```
+#!/bin/bash
+open '/Applications/Google Chrome.app' $@
+```
+
+I named this file `chrome.sh` and made it executable with `chmod +x chrome.sh`.
+
+## Configure poltergeist
+
+Change
+
+```
+Capybara.javascript_driver = :poltergeist
+```
+
+to
+
+```
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app, :inspector => './chrome.sh', :js_errors => true)
+end
+Capybara.javascript_driver = :poltergeist
+```
+
+## Have fun
+
+That should do it. Now you can include `page.driver.debug` in your test. When that’s executed, the test will be paused, and Google Chrome will load a page with two links. Click on the second link, and you should see a familiar WebKit inspector. When you are ready for the test to continue, hit enter in your terminal window.

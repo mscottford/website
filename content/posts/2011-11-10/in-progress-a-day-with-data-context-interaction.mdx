@@ -1,0 +1,308 @@
+---
+title: "[In progress] A Day with Data Context Interaction"
+description: "I recently saw Jim Gay of SaturnFlyer speak at CVREG about Data Context Interaction or DCI[1]."
+dateTime: "2011-11-10T15:42:00.000Z"
+tumblrId: "12600304604"
+tumblrSlug: "in-progress-a-day-with-data-context-interaction"
+---
+
+I recently saw Jim Gay of [SaturnFlyer](http://saturnflyer.com/) speak at CVREG about Data Context Interaction or DCI\[1\].
+
+I really liked the the approach, so I thought I’d dive right into one way that I implemented it on one of the projects that I’m working on. If you’re not familiar with DCI, then I suggest reading one of [Jim’s posts](http://saturnflyer.com/blog/jim/2011/10/04/oop-dci-and-ruby-what-your-system-is-vs-what-your-system-does/) and then coming back. It’s okay, I’ll wait.
+
+Ready? Okay. On to the fun.
+
+I’ve been working on a lot of shopping cart solutions lately, and Authorize.Net configuration seems to be a part of every project. But it’s a part of the project that seems to always have these attributes.
+
+*   The configuration is not tested
+*   Environment variables are used to set this information when we deploy to Heroku
+*   We don’t want to store this information in the source code repository, so we use a authorize\_net.yml.sample file. But if the actual configuration file does not exist then, the initializer usually throws an exception.
+
+Here’s what the initializer looked like before I sunk my teeth in it to fix an issue.
+
+```
+# Use Heroku ENV variables for Authorize.net CIM credentials when present.  No need to include yml in the git repository.
+if ENV['AUTHORIZE_NET_CIM_LOGIN'] && ENV['AUTHORIZE_NET_CIM_PASSWORD'] && ENV['AUTHORIZE_NET_CIM_VALIDATION_MODE'] && ENV['AUTHORIZE_NET_CIM_GATEWAY_MODE']
+  AUTHORIZE_NET_CIM_CREDENTIALS = { login:          ENV['AUTHORIZE_NET_CIM_LOGIN'],
+                                  password:         ENV['AUTHORIZE_NET_CIM_PASSWORD'],
+                                  validation_mode:  ENV['AUTHORIZE_NET_CIM_VALIDATION_MODE'],
+                                  gateway_mode:     ENV['AUTHORIZE_NET_CIM_GATEWAY_MODE'] }
+else
+  config = YAML.load_file(Rails.root.join('config', 'authorize_net_cim.yml'))
+  AUTHORIZE_NET_CIM_CREDENTIALS = { login: config["login"],
+                                  password: config["password"],
+                                  validation_mode: config["validation_mode"],
+                                  gateway_mode: config["gateway_mode"] }
+end
+```
+
+Looks simple, right? But what’s it do? Can you tell me? Probably not without reading closely for a minute or two. Especially, if you’re new to ruby. Anyway, here’s a short description.
+
+1.  If the Heroku config variables are set, then initialize the Authorize.Net constant to contain the relavent information (gateway mode, validation mode, login and password).
+2.  Otherwise, open the yaml configuration file and read the same values from there.
+
+So, now we need to change this. In Heroku, this file is throwing an exception when `rake assets:precompile` is run. When reading the [relavant Heroku’s docs](http://devcenter.heroku.com/articles/rails31_heroku_cedar#troubleshooting) carefully, we find that this is expected. The environment variables in the Heroku configuration are not available at the time that the Heroku precompiles the assets. So we need it to handle that condition, in addition to what it used to do.
+
+Ugh. The TDD practitioner in me really wants to write a test for this. But how can I easily invoke the code in this file? I know, I’ll use what I learned at CVREG and move this logic into a context. Here’s what the initializer looks like after doing so.
+
+```
+require 'contexts/authorize_net_initializing'
+
+AUTHORIZE_NET_CIM_CREDENTIALS = AuthorizeNetInitializing.new(
+  ENV, Rails.root.join('config', 'authorize_net_cim.yml')
+).call
+```
+
+Okay. That’s simple enough. I still don’t really know what’s going on by looking directly at this file. I bet the answer can be found in the `AuthorizeNetInitializing` class. It looks like it needs access to the `ENV` constant that contains the environment variables, and it needs to know where the Authorize.Net configuration file is, in this case `Rails.root.join('config', 'authorize_net_cim.yml')`. Then it get’s called and returns the value that’s stored in `AUTHORIZE_NET_CIM_CREDENTIALS`. If I inspect the old code close enough, I should notice that this is basically the same thing that was happening before. It’s just now that a lot of details are hidden in side the `AuthorizeNetInitializing` class.
+
+So, what’s the `AuthorizeNetInitializing` class look like you ask? Well, let’s write some tests to determine how it should look. I can’t show you what these tests looked like before, because they just did not exist.
+
+```
+require 'spec_helper_no_rails'
+
+require 'contexts/authorize_net_initializing'
+
+describe AuthorizeNetInitializing do
+  context 'authorize.net environment variables are defined' do
+    context 'should check for authorize.net environment varialbes' do
+      subject do
+        environment = Hash.new
+        environment['AUTHORIZE_NET_CIM_GATEWAY_MODE'] = 'testing_gateway_mode'
+        environment['AUTHORIZE_NET_CIM_LOGIN'] = 'testing_cim_login'
+        environment['AUTHORIZE_NET_CIM_PASSWORD'] = 'testing_cim_password'
+        environment['AUTHORIZE_NET_CIM_VALIDATION_MODE'] = 'testing_validation_mode'
+        environment['EXTRA_VALUE'] = 'Ignore Me!'
+
+        context = AuthorizeNetInitializing.new(environment)
+
+        context.call
+      end
+
+      its([:login]) { should == 'testing_cim_login' }
+      its([:password]) { should == 'testing_cim_password' }
+      its([:validation_mode]) { should == 'testing_validation_mode' }
+      its([:gateway_mode]) { should == 'testing_gateway_mode' }
+    end
+  end
+
+  context 'authorize.net environment variables are missing' do
+    context 'and the config file exists' do
+      subject do
+        environment = Hash.new
+
+        temp_dir = File.expand_path('../../../../tmp', __FILE__)
+        config_file_path = File.join(temp_dir, "#{Time.now.strftime('%s')}.yml")
+        File.open(config_file_path, 'w') do |file|
+          file.puts <<-EOS
+---
+login: testing_cim_login
+password: testing_cim_password
+validation_mode: testing_validation_mode
+gateway_mode: testing_gateway_mode
+
+          EOS
+        end
+
+        context = AuthorizeNetInitializing.new(environment, config_file_path)
+
+        result = nil
+        begin
+          result = context.call
+        ensure
+          File.delete(config_file_path)
+        end
+
+        result
+      end
+
+      its([:login]) { should == 'testing_cim_login' }
+      its([:password]) { should == 'testing_cim_password' }
+      its([:validation_mode]) { should == 'testing_validation_mode' }
+      its([:gateway_mode]) { should == 'testing_gateway_mode' }
+    end
+  end
+end
+```
+
+TODO: Write a description of what’s going on here.
+
+Cool. What’s the code look like that makes that pass?
+
+```
+require 'yaml'
+
+class AuthorizeNetInitializing
+  def initialize(environment, config_file = nil, logger = nil)
+    @environment = environment
+    @config_file = config_file
+    @logger = logger
+
+    @environment.extend AuthorizeNetEnvironment
+    @config_file.extend AuthorizeNetConfigFile
+  end
+
+  def call
+    result = nil
+    if @environment.complete?
+      result = @environment.to_authorize_net_hash
+    else
+      result = @config_file.to_authorize_net_hash
+    end
+    result
+  end
+
+  module AuthorizeNetEnvironment
+    def complete?
+      result = true
+      [
+        'AUTHORIZE_NET_CIM_GATEWAY_MODE',
+        'AUTHORIZE_NET_CIM_LOGIN',
+        'AUTHORIZE_NET_CIM_PASSWORD',
+        'AUTHORIZE_NET_CIM_VALIDATION_MODE',
+      ].each do |required_key|
+        result = (result && self.include?(required_key))
+      end
+      result
+    end
+
+    def to_authorize_net_hash
+      result = { 
+        login: self['AUTHORIZE_NET_CIM_LOGIN'],
+        password: self['AUTHORIZE_NET_CIM_PASSWORD'],
+        validation_mode: self['AUTHORIZE_NET_CIM_VALIDATION_MODE'],
+        gateway_mode: self['AUTHORIZE_NET_CIM_GATEWAY_MODE'] 
+      }
+      result
+    end
+  end
+
+  module AuthorizeNetConfigFile
+    def exists?
+      File.exists?(self)
+    end
+
+    def path
+      self
+    end
+
+    def to_authorize_net_hash
+      values = YAML.load_file(self)
+      
+      result = { 
+        :login => values['login'], 
+        :password => values['password'],
+        :validation_mode => values['validation_mode'],
+        :gateway_mode => values['gateway_mode']
+      }
+
+      result
+    end
+  end
+end
+```
+
+TODO: Write a description that steps through what’s going on in that sample.
+
+Now let’s add a test to handle what happens on Heroku when `rake assets:precompile` is run.
+
+```
+context 'config file is missing' do
+      before :each do
+        require 'rspec/mocks'
+        @logger = double('logger')
+      end
+
+      subject do
+        environment = Hash.new
+
+        AuthorizeNetInitializing.new(environment, 'foo.bar', @logger)
+      end
+
+      it 'should display a warning' do
+        @logger.should_receive(:warn).with("Unable to initialize authorize.net support. Make sure that either the environment variables are set or that the configuration file named 'foo.bar' exists.")
+
+        subject.call.should == nil
+      end
+    end
+```
+
+Oh. Shiny! What makes that pass?
+
+```
+require 'yaml'
+
+class AuthorizeNetInitializing
+  def initialize(environment, config_file = nil, logger = nil)
+    @environment = environment
+    @config_file = config_file
+    @logger = logger
+
+    @environment.extend AuthorizeNetEnvironment
+    @config_file.extend AuthorizeNetConfigFile
+  end
+
+  def call
+    result = nil
+    if @environment.complete?
+      result = @environment.to_authorize_net_hash
+    elsif @config_file.exists?
+      result = @config_file.to_authorize_net_hash
+    else        
+      @logger.warn "Unable to initilaize authorize.net support. Make sure that either the environment variables are set or that the configuration file named '#{@config_file.path}' exists."
+    end
+    result
+  end
+
+  module AuthorizeNetEnvironment
+    def complete?
+      result = true
+      [
+        'AUTHORIZE_NET_CIM_GATEWAY_MODE',
+        'AUTHORIZE_NET_CIM_LOGIN',
+        'AUTHORIZE_NET_CIM_PASSWORD',
+        'AUTHORIZE_NET_CIM_VALIDATION_MODE',
+      ].each do |required_key|
+        result = (result && self.include?(required_key))
+      end
+      result
+    end
+
+    def to_authorize_net_hash
+      result = { 
+        login: self['AUTHORIZE_NET_CIM_LOGIN'],
+        password: self['AUTHORIZE_NET_CIM_PASSWORD'],
+        validation_mode: self['AUTHORIZE_NET_CIM_VALIDATION_MODE'],
+        gateway_mode: self['AUTHORIZE_NET_CIM_GATEWAY_MODE'] 
+      }
+      result
+    end
+  end
+
+  module AuthorizeNetConfigFile
+    def exists?
+      File.exists?(self)
+    end
+
+    def path
+      self
+    end
+
+    def to_authorize_net_hash
+      values = YAML.load_file(self)
+      
+      result = { 
+        :login => values['login'], 
+        :password => values['password'],
+        :validation_mode => values['validation_mode'],
+        :gateway_mode => values['gateway_mode']
+      }
+
+      result
+    end
+  end
+end
+```
+
+TODO: Write a description of exactly what changed.
+
+\[1\]: For all of you band geeks, no, it’s not that [DCI](http://www.dci.org/).
