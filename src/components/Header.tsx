@@ -221,11 +221,12 @@ function AvatarContainer({
 
 function Avatar({
   large = false,
+  label = undefined,
   className,
-  children,
   ...props
 }: Omit<React.ComponentPropsWithoutRef<typeof Link>, 'href'> & {
-  large?: boolean
+  large?: boolean,
+  label?: string
 }) {
   return (
     <Link
@@ -244,7 +245,11 @@ function Avatar({
         )}
         priority
       />
-      {children}
+      {label && (
+        <span className="mr-2.5 bg-white/90 px-3 py-2 text-sm font-medium text-zinc-800 hover:text-teal-500 dark:bg-zinc-800/90 dark:text-zinc-200 dark:hover:text-teal-400">
+          M. Scott Ford
+        </span>
+      )}
     </Link>
   )
 }
@@ -365,55 +370,6 @@ export function Header() {
           marginBottom: 'var(--header-mb)',
         }}
       >
-        {isHomePage && (
-          <>
-            <div
-              ref={avatarRef}
-              className="order-last mt-[calc(--spacing(16)-(--spacing(3)))]"
-            />
-            <Container
-              className="top-0 order-last -mb-3 pt-3"
-              style={{
-                position:
-                  'var(--header-position)' as React.CSSProperties['position'],
-              }}
-            >
-              <div
-                className="top-(--avatar-top,--spacing(3)) w-full"
-                style={{
-                  position:
-                    'var(--header-inner-position)' as React.CSSProperties['position'],
-                }}
-              >
-                <div
-                  className="relative"
-                  // style={{ transform: 'var(--avatar-image-transform)' }}
-                >
-                  <AvatarContainer
-                    className="inline-block origin-left"
-                    // className="h-16 origin-left"
-                    style={{
-                      transform: 'var(--avatar-image-transform)',
-                    }}
-                    // style={{
-                    //   opacity: 'var(--avatar-border-opacity, 0)',
-                    //   transform: 'var(--avatar-border-transform)',
-                    // }}
-                  >
-                    <Avatar
-                      large
-                      // style={{ transform: 'var(--avatar-image-transform)' }}
-                    >
-                      <span className="m-2 px-3 py-2 align-middle text-3xl">
-                        M. Scott Ford
-                      </span>
-                    </Avatar>
-                  </AvatarContainer>
-                </div>
-              </div>
-            </Container>
-          </>
-        )}
         <div
           ref={headerRef}
           className="top-0 z-10 h-16 pt-6"
@@ -430,18 +386,12 @@ export function Header() {
             }}
           >
             <div className="relative flex gap-4">
-              <div className="flex flex-1">
-                {!isHomePage && (
-                  <AvatarContainer>
-                    <Avatar>
-                      <span className="m-2 px-3 py-2 align-middle text-sm font-medium">
-                        M. Scott Ford
-                      </span>
-                    </Avatar>
-                  </AvatarContainer>
-                )}
+              <div className="flex ">
+                <AvatarContainer>
+                  <Avatar label="M. Scott Ford"/>
+                </AvatarContainer>
               </div>
-              <div className="flex flex-1 justify-end md:justify-center">
+              <div className="flex flex-1 justify-end md:justify-start">
                 <MobileNavigation className="pointer-events-auto md:hidden" />
                 <DesktopNavigation className="pointer-events-auto hidden md:block" />
               </div>
