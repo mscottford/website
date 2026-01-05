@@ -58,6 +58,17 @@ const socialLinks = defineCollection({
   }
 });
 
+const navItems = defineCollection({
+  name: 'navItems',
+  directory: './content/nav-items',
+  include: '**/*.yaml',
+  parser: 'yaml',
+  schema: z.object({
+    label: z.string(),
+    href: z.string(),
+  }),
+});
+
 export default defineConfig({
-  collections: [posts, socialLinks],
+  collections: [posts, socialLinks, navItems],
 });
