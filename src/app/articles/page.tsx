@@ -42,6 +42,10 @@ export const metadata: Metadata = {
 }
 
 export default async function ArticlesIndex() {
+  const sortedPosts = [...allPosts].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
   return (
     <SimpleLayout
       title="Writing on software design, company building, and the aerospace industry."
@@ -49,7 +53,7 @@ export default async function ArticlesIndex() {
     >
       <div className="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
         <div className="flex max-w-3xl flex-col space-y-16">
-          {allPosts.map((article) => (
+          {sortedPosts.map((article) => (
             <Article key={article._meta.path} article={article} />
           ))}
         </div>
