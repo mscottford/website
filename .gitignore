@@ -2,6 +2,7 @@
 
 # Apple specific icon files
 Icon?
+![iI]con[_a-zA-Z0-9]
 
 # dependencies
 /node_modules
