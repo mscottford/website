@@ -86,7 +86,7 @@ Existing RSS subscribers at `https://mscottford.com/rss` need to be considered d
 
 **Recommended mitigations:**
 
-- [ ] **Add `/rss` route** - Create redirect or duplicate feed at `/rss` for backwards compatibility
+- [x] **Add `/rss` redirect** - Handled via S3 routing rules (see URL Redirects section)
 - [x] **Preserve Tumblr GUIDs for imports** - Store original Tumblr post ID in frontmatter and use it as GUID for imported posts:
   ```yaml
   ---
@@ -95,7 +95,7 @@ Existing RSS subscribers at `https://mscottford.com/rss` need to be considered d
   tumblrId: "757620834301083648"  # Original Tumblr post ID
   ---
   ```
-- [ ] **Update feed route** - Modify `feed.xml/route.ts` to use `tumblrId` as GUID when present:
+- [x] **Update feed route** - Modify `feed.xml/route.ts` to use `tumblrId` as GUID when present:
   ```typescript
   feed.addItem({
     id: post.tumblrId
@@ -104,7 +104,7 @@ Existing RSS subscribers at `https://mscottford.com/rss` need to be considered d
     // ...
   });
   ```
-- [ ] **Exclude old imports from feed** - Option to only include posts newer than a cutoff date (e.g., 2024) in the feed to avoid flooding subscribers
+- [x] **Exclude old imports from feed** - Only includes posts from 2024 onwards to avoid flooding subscribers
 - [ ] **Offer both RSS and Atom** - Add `/feed.rss` endpoint for RSS 2.0 format compatibility
 
 ### Metadata & SEO
@@ -125,7 +125,7 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
 
 **Recommended improvements:**
 
-- [ ] **Update root layout metadata** - Add Open Graph and Twitter Card defaults:
+- [x] **Update root layout metadata** - Add Open Graph and Twitter Card defaults:
   ```typescript
   export const metadata: Metadata = {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
@@ -144,7 +144,7 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
   }
   ```
 
-- [ ] **Add per-article metadata** - Export `generateMetadata` in `src/app/articles/[slug]/page.tsx`:
+- [x] **Add per-article metadata** - Export `generateMetadata` in `src/app/articles/[slug]/page.tsx`:
   ```typescript
   export async function generateMetadata({ params }): Promise<Metadata> {
     const article = allPosts.find((post) => post.slug === params.slug);
@@ -161,7 +161,7 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
   }
   ```
 
-- [ ] **Add JSON-LD structured data** - Create component for article pages:
+- [x] **Add JSON-LD structured data** - Create component for article pages:
   ```typescript
   // src/components/ArticleJsonLd.tsx
   export function ArticleJsonLd({ article }) {
@@ -217,7 +217,7 @@ S3 supports native HTTP 301 redirects via routing rules - proper SEO-friendly re
   ---
   ```
 
-- [ ] **Generate S3 routing rules** - Create build script `scripts/generate-s3-redirects.ts`:
+- [x] **Generate S3 routing rules** - Create build script `scripts/generate-s3-redirects.ts`:
   ```typescript
   import { allPosts } from 'content-collections';
 
