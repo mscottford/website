@@ -1,0 +1,40 @@
+---
+title: "[Updated] Fixed: Verizon router keeps changing my hostname to `new-host`"
+description: "I just figured out to solve an issue I was running into and thought I would share the fix."
+dateTime: "2012-06-14T19:39:00.000Z"
+tumblrId: "25106788989"
+tumblrSlug: "updated-fixed-verizon-router-keeps-changing-my"
+---
+
+I just figured out to solve an issue I was running into and thought I would share the fix.
+
+## The Problem
+
+You open terminal and notice that your host name is set to `new-host` or `new-host-2` or `new-host-3`, you get the idea. You’ve tried setting the hostname to what it should be with `sudo hostname <correct-host-name>`, but it magically changed back later. You’re probably connecting to your router via ethernet cable, and you did not notice this problem when you were connecting via wireless.
+
+## The Solution
+
+(This set of instructions assumes that your Verizon FiOS router is running the same version as me. If these steps don’t work for you, keep digging until you find the DHCP settings.)
+
+1.  Visit your router’s configuration page (mine was at [http://192.168.1.1](http://192.168.1.1)) and log in. If you don’t know the password, then you’ll need to stop and figure out how to get it. Reseting your router is probably an option.
+    
+2.  Click on “My Network” at the top of the page.
+    
+3.  Click on “Network Connections” on the left of the page.
+    
+4.  Click on “Network (Home/Office)”
+    
+5.  Click on “IP Address Distribution”
+    
+6.  Click on “Network (Home/Office)”
+    
+7.  Remove the check box from “Provide Host Name If Not Specified by Client”
+    
+8.  Click “Apply” at the bottom of the page.
+    
+9.  Renew your DHCP lease. In MacOS X, you can do this by visiting System Preferences -> Network. Click on “Advanced…” and then on “Renew DHCP Lease”.
+    
+
+Now when you open up a new terminal window. You should see the hostname that you expect to see.
+
+Update - July 26, 2012: This only seem to work for a week or two. More searching led me to [another article](http://johnjamesjacoby.wordpress.com/2010/12/11/osx-hostname-and-fios/) complaining about the problem. Based on the recommendations there, I tried setting the `DHCP Client ID` value in Mac OS X’s network settings. After I clicked `Apply` and waited for my computer to reconnect, opening a new terminal window showed my computer’s name again.

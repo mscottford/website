@@ -1,0 +1,57 @@
+---
+title: "Fix annoying issues with editing previous commands in irb with ruby built with ruby-build or rbenv install"
+description: "Note: This is as much for my benefit later as it is for anyone else."
+dateTime: "2012-06-07T20:12:00.000Z"
+tumblrId: "24627902270"
+tumblrSlug: "fix-annoying-issues-with-editing-previous-commands"
+---
+
+Note: This is as much for my benefit later as it is for anyone else.
+
+Have you ever tried to edit a previous command in irb? Have you ever noticed things go all crazy, and it’s hard to tell what you’ve edited? The solution is to build ruby with readline support.
+
+These steps will only work on Mac OS X, assume that you have `brew` installed, and that you are using `rbenv` paired with `ruby-build`.
+
+## Install readline
+
+Install readline with
+
+```
+brew install readline
+```
+
+Then run
+
+```
+brew info readline
+```
+
+You should see something that looks like the following. The last two lines will indicate where readline is installed. Copy that path into your clipboard, because you’ll need it in the next step.
+
+```
+readline 6.2.2
+http://tiswww.case.edu/php/chet/readline/rltop.html
+
+This formula is keg-only.
+OS X provides the BSD libedit library, which shadows libreadline.
+In order to prevent conflicts when programs look for libreadline we are
+defaulting this GNU Readline installation to keg-only.
+
+/usr/local/Cellar/readline/6.2.1 (32 files, 1.9M)
+/usr/local/Cellar/readline/6.2.2 (30 files, 1.7M)
+https://github.com/mxcl/homebrew/commits/master/Library/Formula/readline.rb
+```
+
+## Install ruby
+
+`ruby-build`, which get’s invoked when you run `rbenv install`, will use options that you specify in the `CONFIGURE_OPTS` environment variable. To enable `readline` support you need to provide `--with-readline-dir=<path to readline dir>`.
+
+Like this
+
+```
+CONFIGURE_OPTS="--with-readline-dir=/usr/local/Cellar/readline/6.2.2/" rbenv install 1.9.3-p194
+```
+
+## Check it out
+
+After ruby has finished installing, make sure that you switch to the ruby version that was just installed `rbenv shell 1.9.3-p194`. Then run `irb` with some commands that span multiple lines. Hit the up arrow to access a previous command, make all the changes you want, and hit enter. Everything should look fine.

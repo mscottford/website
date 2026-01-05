@@ -6,17 +6,26 @@ import { Layout } from '@/components/Layout'
 import '@/styles/tailwind.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://mscottford.com'),
   title: {
-    template: '%s - Spencer Sharp',
-    default:
-      'Spencer Sharp - Software designer, founder, and amateur astronaut',
+    template: '%s - M. Scott Ford',
+    default: 'M. Scott Ford - Software engineer and founder',
   },
   description:
-    'I’m Spencer, a software designer and entrepreneur based in New York City. I’m the founder and CEO of Planetaria, where we develop technologies that empower regular people to explore space on their own terms.',
+    "I'm Scott, a software engineer and entrepreneur. I help teams improve their software delivery practices and build better products.",
   alternates: {
     types: {
       'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL}/feed.xml`,
     },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'M. Scott Ford',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    creator: '@mscottford',
   },
 }
 

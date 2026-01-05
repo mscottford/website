@@ -13,6 +13,9 @@ const posts = defineCollection({
     title: z.string(),
     description: z.string(),
     content: z.string(),
+    dateTime: z.string(),
+    tumblrId: z.string().optional(),
+    tumblrSlug: z.string().optional(),
   }),
   transform: async ({ content: _, ...post }, { cache }) => {
     const lastModifiedAt = await cache(post._meta.filePath, async (filePath) => {
@@ -23,17 +26,14 @@ const posts = defineCollection({
       return new Date().toISOString();
     });
 
-    const createdAt = await cache(post._meta.filePath, async (filePath) => {
-      const { stdout } = await exec(`git log --follow --format=%ai -- ${filePath} | tail -1`);
-      if (stdout) {
-        return new Date(stdout.trim()).toISOString();
-      }
-      return new Date().toISOString();
-    });
+    const createdAt = new Date(post.dateTime).toISOString();
+
+    // Use filename (without extension) as slug instead of deriving from title
+    const slug = post._meta.fileName.replace(/\.mdx$/, '');
 
     return {
       ...post,
-      slug: post.title.toLowerCase().replace(/ /g, "-"),
+      slug,
       createdAt,
       lastModifiedAt,
     }

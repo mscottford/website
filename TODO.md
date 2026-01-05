@@ -17,33 +17,27 @@ The existing blog is hosted on Tumblr with a custom domain. Key findings:
 
 Create `scripts/import-tumblr/index.ts` to automate the migration:
 
-- [ ] **Fetch posts from Tumblr API**
+- [x] **Fetch posts from Tumblr API**
   - Use `https://mscottford.com/api/read/json?num=50` to get all posts
   - Parse JSONP response (wrapped in `var tumblr_api_read = {...}`)
 
-- [ ] **Convert HTML to MDX**
+- [x] **Convert HTML to MDX**
   - Use a library like `turndown` to convert HTML to Markdown
   - Handle code blocks (detect `<pre>` and `<code>` tags)
   - Extract and preserve image URLs
   - Generate appropriate frontmatter (`title`, `description`)
 
-- [ ] **Download and store images**
+- [x] **Download and store images**
   - Download images referenced in posts to `content/posts/[date]/` alongside the MDX file
   - Update image references to use relative paths
 
-- [ ] **Create MDX files**
+- [x] **Create MDX files**
   - Output to `content/posts/[YYYY-MM-DD]/[slug].mdx`
   - Generate description from first paragraph if not available
 
-- [ ] **Commit with historical dates**
-  - The blog uses `git log --follow` to determine `createdAt` from first commit
-  - Each post must be committed with the original publication date:
-    ```bash
-    GIT_AUTHOR_DATE="2012-09-04T12:00:00" GIT_COMMITTER_DATE="2012-09-04T12:00:00" \
-      git commit -m "Import: Post Title"
-    ```
-  - Posts must be committed in chronological order (oldest first)
-  - Consider creating a separate branch for import, then rebasing/merging
+- [x] **Date handling via `dateTime` frontmatter**
+  - All posts use a required `dateTime` field in frontmatter for `createdAt`
+  - Import script sets `dateTime` from Tumblr's `unix-timestamp`
 
 ### Posts to Import
 
@@ -92,8 +86,8 @@ Existing RSS subscribers at `https://mscottford.com/rss` need to be considered d
 
 **Recommended mitigations:**
 
-- [ ] **Add `/rss` route** - Create redirect or duplicate feed at `/rss` for backwards compatibility
-- [ ] **Preserve Tumblr GUIDs for imports** - Store original Tumblr post ID in frontmatter and use it as GUID for imported posts:
+- [x] **Add `/rss` redirect** - Handled via S3 routing rules (see URL Redirects section)
+- [x] **Preserve Tumblr GUIDs for imports** - Store original Tumblr post ID in frontmatter and use it as GUID for imported posts:
   ```yaml
   ---
   title: "Post Title"
@@ -101,7 +95,7 @@ Existing RSS subscribers at `https://mscottford.com/rss` need to be considered d
   tumblrId: "757620834301083648"  # Original Tumblr post ID
   ---
   ```
-- [ ] **Update feed route** - Modify `feed.xml/route.ts` to use `tumblrId` as GUID when present:
+- [x] **Update feed route** - Modify `feed.xml/route.ts` to use `tumblrId` as GUID when present:
   ```typescript
   feed.addItem({
     id: post.tumblrId
@@ -110,7 +104,7 @@ Existing RSS subscribers at `https://mscottford.com/rss` need to be considered d
     // ...
   });
   ```
-- [ ] **Exclude old imports from feed** - Option to only include posts newer than a cutoff date (e.g., 2024) in the feed to avoid flooding subscribers
+- [x] **Exclude old imports from feed** - Only includes posts from 2024 onwards to avoid flooding subscribers
 - [ ] **Offer both RSS and Atom** - Add `/feed.rss` endpoint for RSS 2.0 format compatibility
 
 ### Metadata & SEO
@@ -131,7 +125,7 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
 
 **Recommended improvements:**
 
-- [ ] **Update root layout metadata** - Add Open Graph and Twitter Card defaults:
+- [x] **Update root layout metadata** - Add Open Graph and Twitter Card defaults:
   ```typescript
   export const metadata: Metadata = {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
@@ -150,7 +144,7 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
   }
   ```
 
-- [ ] **Add per-article metadata** - Export `generateMetadata` in `src/app/articles/[slug]/page.tsx`:
+- [x] **Add per-article metadata** - Export `generateMetadata` in `src/app/articles/[slug]/page.tsx`:
   ```typescript
   export async function generateMetadata({ params }): Promise<Metadata> {
     const article = allPosts.find((post) => post.slug === params.slug);
@@ -167,7 +161,7 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
   }
   ```
 
-- [ ] **Add JSON-LD structured data** - Create component for article pages:
+- [x] **Add JSON-LD structured data** - Create component for article pages:
   ```typescript
   // src/components/ArticleJsonLd.tsx
   export function ArticleJsonLd({ article }) {
@@ -214,7 +208,7 @@ S3 supports native HTTP 301 redirects via routing rules - proper SEO-friendly re
 
 **Implementation:**
 
-- [ ] **Store Tumblr metadata in frontmatter** for imported posts:
+- [x] **Store Tumblr metadata in frontmatter** for imported posts:
   ```yaml
   ---
   title: "MacBook Pro Keyboard Hacks"
@@ -223,7 +217,7 @@ S3 supports native HTTP 301 redirects via routing rules - proper SEO-friendly re
   ---
   ```
 
-- [ ] **Generate S3 routing rules** - Create build script `scripts/generate-s3-redirects.ts`:
+- [x] **Generate S3 routing rules** - Create build script `scripts/generate-s3-redirects.ts`:
   ```typescript
   import { allPosts } from 'content-collections';
 
@@ -445,8 +439,8 @@ Automate the build, deploy, and cache invalidation process.
 ### Other Considerations
 
 - [ ] **Filter content**: Decide which posts to import (skip image-only posts? link-only posts?)
-- [ ] **Slug generation**: Current system generates slugs from titles; may conflict with Tumblr slugs
-- [ ] **Image hosting**: Tumblr images may become unavailable; download and store locally
+- [x] **Slug generation**: Uses filename as slug; import script uses Tumblr's slug
+- [x] **Image hosting**: Images downloaded and stored locally alongside MDX files
 - [ ] **Code syntax highlighting**: Ensure imported code blocks use proper language hints
 
 ## Placeholder Content
