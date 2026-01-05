@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 
 const staticExportOptions = 
-  process.env.STATIC_EXPORT === 'true' ? {
+  process.env.STATIC_EXPORT !== 'false' ? {
     output: 'export',
     trailingSlash: true,
     basePath: process.env.PAGES_BASE_PATH,
