@@ -180,7 +180,9 @@ function SocialLinks() {
 }
 
 export default async function Home() {
-  let articles = allPosts.slice(0, 4)
+  let articles = [...allPosts]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 4)
 
   return (
     <>
