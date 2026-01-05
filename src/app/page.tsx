@@ -5,11 +5,6 @@ import clsx from 'clsx'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
 import { Container } from '@/components/Container'
-import {
-  GitHubIcon,
-  LinkedInIcon,
-  MastodonIcon,
-} from '@/components/SocialIcons'
 import logoAirbnb from '@/images/logos/airbnb.svg'
 import logoFacebook from '@/images/logos/facebook.svg'
 import logoPlanetaria from '@/images/logos/planetaria.svg'
@@ -19,44 +14,12 @@ import image2 from '@/images/photos/image-2.jpg'
 import image3 from '@/images/photos/image-3.jpg'
 import image4 from '@/images/photos/image-4.jpg'
 import image5 from '@/images/photos/image-5.jpg'
-import { allPosts, Post } from 'content-collections'
+import { allPosts, type Post, allSocialLinks } from 'content-collections'
 import { formatDate } from '@/lib/formatDate'
-
-function BriefcaseIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <path
-        d="M2.75 9.75a3 3 0 0 1 3-3h12.5a3 3 0 0 1 3 3v8.5a3 3 0 0 1-3 3H5.75a3 3 0 0 1-3-3v-8.5Z"
-        className="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500"
-      />
-      <path
-        d="M3 14.25h6.249c.484 0 .952-.002 1.316.319l.777.682a.996.996 0 0 0 1.316 0l.777-.682c.364-.32.832-.319 1.316-.319H21M8.75 6.5V4.75a2 2 0 0 1 2-2h2.5a2 2 0 0 1 2 2V6.5"
-        className="stroke-zinc-400 dark:stroke-zinc-500"
-      />
-    </svg>
-  )
-}
-
-function ArrowDownIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
-      <path
-        d="M4.75 8.75 8 12.25m0 0 3.25-3.5M8 12.25v-8.5"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
+import { BriefcaseIcon } from '@/components/icons/BriefcaseIcon'
+import { ArrowDownIcon } from '@/components/icons/ArrowDownIcon'
+import { SocialLink } from '@/components/SocialLink'
+import { iconsByName } from '@/lib/icons'
 
 function Article({ article }: { article: Post }) {
   return (
@@ -70,19 +33,6 @@ function Article({ article }: { article: Post }) {
       <Card.Description>{article.description}</Card.Description>
       <Card.Cta>Read article</Card.Cta>
     </Card>
-  )
-}
-
-function SocialLink({
-  icon: Icon,
-  ...props
-}: React.ComponentPropsWithoutRef<typeof Link> & {
-  icon: React.ComponentType<{ className?: string }>
-}) {
-  return (
-    <Link className="group -m-1 p-1" {...props}>
-      <Icon className="h-6 w-6 fill-zinc-500 transition group-hover:fill-zinc-600 dark:fill-zinc-400 dark:group-hover:fill-zinc-300" />
-    </Link>
   )
 }
 
@@ -214,6 +164,21 @@ function Photos() {
   )
 }
 
+function SocialLinks() {
+  return (
+    <div className="mt-6 flex gap-6">
+      {allSocialLinks.map((link) => (
+        <SocialLink
+          key={link.platform}
+          href={link.url}
+          aria-label={link.alt}
+          icon={iconsByName[link.slug]}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default async function Home() {
   let articles = allPosts.slice(0, 4)
 
@@ -234,23 +199,7 @@ export default async function Home() {
             <Link href="https://legacycode.rocks">Legacy Code Rocks</Link>{' '}
             community/podcast, conference talks, and on this site.
           </p>
-          <div className="mt-6 flex gap-6">
-            <SocialLink
-              href="https://toot.legacycode.rocks/@mscottford"
-              aria-label="Follow on Mastodon"
-              icon={MastodonIcon}
-            />
-            <SocialLink
-              href="https://github.com/mscottford"
-              aria-label="Follow on GitHub"
-              icon={GitHubIcon}
-            />
-            <SocialLink
-              href="https://linkedin.com/in/mscottford"
-              aria-label="Follow on LinkedIn"
-              icon={LinkedInIcon}
-            />
-          </div>
+          <SocialLinks />
         </div>
       </Container>
       <Photos />

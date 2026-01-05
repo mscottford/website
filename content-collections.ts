@@ -40,6 +40,24 @@ const posts = defineCollection({
   }
 });
 
+const socialLinks = defineCollection({
+  name: 'socialLinks',
+  directory: './content/social-links',
+  include: '**/*.yaml',
+  parser: 'yaml',
+  schema: z.object({
+    platform: z.string(),
+    url: z.url(),
+    alt: z.string(),
+  }),
+  transform: async ({ ...link }) => {
+    return {
+      ...link,
+      slug: link.platform.toLowerCase().replace(/ /g, "-"),
+    }
+  }
+});
+
 export default defineConfig({
-  collections: [posts],
+  collections: [posts, socialLinks],
 });
