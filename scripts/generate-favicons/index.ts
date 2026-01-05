@@ -66,7 +66,7 @@ const configuration: FaviconOptions = {
 
 const appDir = path.join(__dirname, "..", "..", "src", "app");
 const dest = path.join(__dirname, "generated");
-const source = path.join(__dirname, "headshot.jpeg");
+const source = path.join(__dirname, "..", "..", "src", "images", "avatar.jpg");
 
 const response = await favicons(source, configuration);
 await fs.mkdir(dest, { recursive: true });
