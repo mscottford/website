@@ -240,201 +240,116 @@ S3 supports native HTTP 301 redirects via routing rules - proper SEO-friendly re
   console.log(JSON.stringify({ RoutingRules: rules }, null, 2));
   ```
 
-- [ ] **Configure S3 bucket website** - Apply routing rules via AWS CLI or Terraform:
-  ```bash
-  aws s3api put-bucket-website --bucket mscottford.com --website-configuration file://s3-website-config.json
-  ```
-
-- [ ] **Set up CloudFront distribution** - Required for HTTPS with custom domain
-
-- [ ] **Configure Route 53 or DNS** - Point domain to CloudFront distribution
-
-**S3 routing rules example:**
-```xml
-<RoutingRules>
-  <RoutingRule>
-    <Condition>
-      <KeyPrefixEquals>post/757620834301083648</KeyPrefixEquals>
-    </Condition>
-    <Redirect>
-      <HttpRedirectCode>301</HttpRedirectCode>
-      <ReplaceKeyWith>articles/macbook-pro-keyboard-hacks/</ReplaceKeyWith>
-    </Redirect>
-  </RoutingRule>
-  <RoutingRule>
-    <Condition>
-      <KeyPrefixEquals>rss</KeyPrefixEquals>
-    </Condition>
-    <Redirect>
-      <HttpRedirectCode>301</HttpRedirectCode>
-      <ReplaceKeyWith>feed.xml</ReplaceKeyWith>
-    </Redirect>
-  </RoutingRule>
-</RoutingRules>
-```
+- [ ] **Apply S3 routing rules via Terraform** - Integrate generated routing rules into Terraform configuration
 
 **Note:** S3 routing rules are processed sequentially. More specific rules should come before general rules.
 
-### Deployment Automation (S3 + CloudFront)
+### Deployment Infrastructure (Terraform)
 
-Automate the build, deploy, and cache invalidation process.
+Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S3 for static hosting and CloudFront for CDN/HTTPS.
 
-**Deployment pipeline steps:**
-1. Build the Next.js static export
-2. Sync files to S3 bucket
-3. Update S3 routing rules (if changed)
-4. Invalidate CloudFront cache
+**Current infrastructure (`deploy/terraform/`):**
+- [x] S3 bucket for Terraform state with versioning and encryption
+- [x] S3 backend configuration for remote state
+- [x] S3 bucket for static site (staging environment)
+- [x] S3 bucket website configuration (index.html, 404.html)
+- [x] CloudFront distribution with Origin Access Control (OAC)
+- [x] Route 53 A record for `staging.mscottford.com`
+- [x] Automatic content-type detection based on file extension
 
-**Implementation:**
+**Infrastructure improvements needed:**
 
-- [ ] **Create deployment script** - Add `scripts/deploy.sh`:
-  ```bash
-  #!/bin/bash
-  set -e
+- [ ] **Production deployment support** - Add ability to deploy to either:
+  - Staging: `staging.mscottford.com`
+  - Production: `mscottford.com` (apex domain)
+  - Consider using Terraform workspaces or separate tfvars files
 
-  S3_BUCKET="mscottford.com"
-  CLOUDFRONT_DISTRIBUTION_ID="EXXXXXXXXXX"
+- [ ] **www redirect** - Add redirect from `www.mscottford.com` to `mscottford.com`
+  - Create S3 bucket for www redirect or use CloudFront function
+  - Add Route 53 record for www subdomain
 
-  # Build the site
-  echo "Building site..."
-  pnpm build
+- [ ] **Make S3 buckets private** - Currently public; should use CloudFront OAC exclusively
+  - Remove public access block settings
+  - Update bucket policy to only allow CloudFront OAC access
+  - Ensure content is only accessible via CloudFront URLs
 
-  # Sync to S3 (delete files that no longer exist)
-  echo "Syncing to S3..."
-  aws s3 sync out/ s3://$S3_BUCKET/ \
-    --delete \
-    --cache-control "public, max-age=31536000, immutable" \
-    --exclude "*.html" \
-    --exclude "feed.xml"
+- [ ] **Enable S3 versioning for static site buckets** - For rollback capability
+  - Add `aws_s3_bucket_versioning` resource for static site bucket
+  - Consider lifecycle rules to expire old versions
 
-  # HTML files with shorter cache (for updates)
-  aws s3 sync out/ s3://$S3_BUCKET/ \
-    --exclude "*" \
-    --include "*.html" \
-    --include "feed.xml" \
-    --cache-control "public, max-age=0, must-revalidate"
+- [ ] **Enable access logging** - For traffic analysis and debugging
+  - Create logging S3 bucket
+  - Enable CloudFront access logs
+  - Enable S3 access logs
+  - Consider log retention lifecycle policies
 
-  # Invalidate CloudFront cache
-  echo "Invalidating CloudFront cache..."
-  aws cloudfront create-invalidation \
-    --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
-    --paths "/*"
+- [ ] **CloudWatch cost alarm** - Alert if website costs exceed $10/month
+  - Create CloudWatch billing alarm
+  - Include all related resources: S3 storage, CloudFront data transfer, Route 53 queries, CloudWatch logs
+  - Set up SNS topic for notifications
 
-  echo "Deployment complete!"
-  ```
+- [ ] **SSL/TLS certificate** - Use ACM for custom domain HTTPS
+  - Request ACM certificate for `mscottford.com` and `*.mscottford.com`
+  - Update CloudFront to use custom certificate instead of default
 
-- [ ] **GitHub Actions workflow** - Add `.github/workflows/deploy.yml`:
-  ```yaml
-  name: Deploy to S3
+- [ ] **CloudFront cache behaviors** - Optimize caching per content type
+  - Long cache for static assets (JS, CSS, images, fonts)
+  - Short/no cache for HTML and feed.xml
 
-  on:
-    push:
-      branches: [main]
-    workflow_dispatch:
+### Deployment Automation (GitHub Actions)
 
-  jobs:
-    deploy:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-          with:
-            fetch-depth: 0  # Full history for git log dates
+Automate the build and deploy process via GitHub Actions and Terraform.
 
-        - uses: pnpm/action-setup@v2
-          with:
-            version: 8
+**GitHub Actions workflows needed:**
 
-        - uses: actions/setup-node@v4
-          with:
-            node-version: '20'
-            cache: 'pnpm'
+- [ ] **Staging deployment on PR** - Deploy preview to staging for pull requests
+  - Trigger on `pull_request` events
+  - Build the site with staging URL
+  - Run `terraform apply` for staging environment
+  - Comment on PR with staging URL
 
-        - name: Install dependencies
-          run: pnpm install
+- [ ] **Production deployment on merge** - Deploy to production when merging to `main`
+  - Trigger on `push` to `main` branch
+  - Build the site with production URL
+  - Run `terraform apply` for production environment
+  - Invalidate CloudFront cache
 
-        - name: Build
-          run: pnpm build
-          env:
-            NEXT_PUBLIC_SITE_URL: https://mscottford.com
+- [ ] **Configure GitHub secrets/variables** - Add to repository settings:
+  - `AWS_ACCESS_KEY_ID` - IAM user/role access key
+  - `AWS_SECRET_ACCESS_KEY` - IAM user/role secret key
+  - Or use OIDC: `AWS_ROLE_ARN` for keyless authentication (recommended)
 
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
-
-        - name: Sync to S3
-          run: |
-            aws s3 sync out/ s3://${{ secrets.S3_BUCKET }}/ \
-              --delete \
-              --cache-control "public, max-age=31536000, immutable" \
-              --exclude "*.html" \
-              --exclude "feed.xml"
-            aws s3 sync out/ s3://${{ secrets.S3_BUCKET }}/ \
-              --exclude "*" \
-              --include "*.html" \
-              --include "feed.xml" \
-              --cache-control "public, max-age=0, must-revalidate"
-
-        - name: Invalidate CloudFront
-          run: |
-            aws cloudfront create-invalidation \
-              --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-              --paths "/*"
-  ```
-
-- [ ] **Configure GitHub secrets** - Add to repository settings:
-  - `AWS_ACCESS_KEY_ID` - IAM user access key
-  - `AWS_SECRET_ACCESS_KEY` - IAM user secret key
-  - `S3_BUCKET` - Bucket name (e.g., `mscottford.com`)
-  - `CLOUDFRONT_DISTRIBUTION_ID` - Distribution ID (e.g., `EXXXXXXXXXX`)
-
-- [ ] **Create IAM user for deployment** - With minimal permissions:
-  ```json
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ],
-        "Resource": [
-          "arn:aws:s3:::mscottford.com",
-          "arn:aws:s3:::mscottford.com/*"
-        ]
-      },
-      {
-        "Effect": "Allow",
-        "Action": "cloudfront:CreateInvalidation",
-        "Resource": "arn:aws:cloudfront::ACCOUNT_ID:distribution/DISTRIBUTION_ID"
-      }
-    ]
-  }
-  ```
-
-- [ ] **Add npm script** - In `package.json`:
-  ```json
-  {
-    "scripts": {
-      "deploy": "./scripts/deploy.sh"
-    }
-  }
-  ```
+- [ ] **Create IAM role for GitHub Actions** - With minimal permissions:
+  - S3: PutObject, GetObject, DeleteObject, ListBucket for site buckets
+  - CloudFront: CreateInvalidation, GetDistribution
+  - Route 53: ChangeResourceRecordSets (if DNS changes needed)
+  - Consider using OIDC provider for keyless auth (more secure)
 
 **Cache strategy:**
 - Static assets (JS, CSS, images): Long cache (`max-age=31536000, immutable`)
-- HTML files: No cache (`max-age=0, must-revalidate`) - CloudFront serves fresh content
+- HTML files: Short cache with revalidation - CloudFront serves fresh content
 - RSS feed: No cache - Always fresh for feed readers
 
 **CloudFront invalidation notes:**
 - First 1,000 invalidation paths per month are free
 - Wildcard `/*` counts as one path
 - Invalidations typically complete in 1-2 minutes
+
+### Additional Deployment Considerations
+
+Items to consider for a production-ready deployment:
+
+- [ ] **CloudFront error pages** - Custom error responses:
+  - 404 → `/404.html` with 404 status
+  - 403 → `/404.html` with 404 status (S3 returns 403 for missing files)
+
+- [ ] **Terraform state locking** - Add DynamoDB table for state locking
+  - Prevents concurrent modifications
+  - Recommended for team environments or CI/CD
+
+- [ ] **Cache invalidation strategy** - More granular than `/*`:
+  - Invalidate only changed paths on deploy
+  - Reduces invalidation costs at scale
 
 ### Other Considerations
 
