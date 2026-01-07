@@ -1,4 +1,37 @@
-# Template Filler Content to Replace
+# Project TODOs
+
+This document outlines various tasks and improvements.
+
+## Launch Plan
+
+This section documents the work that needs to be completed before launching the new site.
+
+- [ ] Fix image loading on blog posts - the keyboard hacks post has broken images
+- [ ] Update all placeholder content that is not in a "hidden" state (see Placeholder Content section)
+- [ ] Complete all items from the Deployment sections (Terraform, GitHub Actions)
+- [ ] Add link on homepage below article list to view all articles
+- [ ] Test RSS feed migration to ensure existing subscribers are not disrupted
+- [ ] Test S3 redirects to ensure all old URLs redirect properly
+- [ ] Remove newsletter signup functionality. We are not using this feature.
+
+### Hidden Content
+
+Implement a feature flag or similar capability to control the visibility of unfinished content. The content should be visible when running a development server but hidden in production builds until ready.
+
+- [ ] Hide the nav links for the about, projects, speaking, and uses pages until content is added
+- [ ] Hide the resume section on the homepage until the about page is done
+- [ ] Hide the photo section on the homepage until real photos are addeds
+
+### Visible Placeholder Content
+
+These items are currently visible on the site and need to be updated before launch:
+
+- [ ] `src/app/layout.tsx` - Site metadata
+  - [ ] Page title template (currently "Spencer Sharp")
+  - [ ] Meta description
+
+- [ ] `src/components/Footer.tsx`
+  - [ ] Copyright name (currently "Spencer Sharp")
 
 ## Old Content Import
 
