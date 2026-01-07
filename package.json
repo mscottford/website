@@ -38,6 +38,7 @@
   "devDependencies": {
     "@content-collections/core": "^0.13.0",
     "@content-collections/next": "^0.2.10",
+    "@types/mdx": "^2.0.13",
     "@types/node": "^24.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
