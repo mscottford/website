@@ -4,6 +4,7 @@ import nextMDX from '@next/mdx'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
+import remarkPostImages from './scripts/remark-post-images.ts'
 
 const __dirname = new URL('.', import.meta.url).pathname;
 
@@ -36,7 +37,7 @@ const nextConfig = {
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter],
+    remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter, remarkPostImages],
     rehypePlugins: [rehypePrism],
   },
 })

@@ -47,5 +47,8 @@ next-env.d.ts
 /src/app/icon*.png
 /src/app/favicon.ico
 
+# Post images copied from content/posts by pnpm copy:images
+/public/images/posts/
+
 # JetBrains IDEs
 /.idea/

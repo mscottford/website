@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "pnpm run build:favicons",
+    "predev": "pnpm run build:favicons && pnpm run copy:images",
     "dev": "next dev",
-    "prebuild": "pnpm run build:favicons",
+    "prebuild": "pnpm run build:favicons && pnpm run copy:images",
     "build": "next build",
     "build:favicons": "ts-node --esm ./scripts/generate-favicons/index.ts",
+    "copy:images": "ts-node --esm ./scripts/copy-post-images.ts",
     "prestart": "pnpm run build:favicons",
     "start": "next start",
     "lint": "next lint"
@@ -22,6 +23,7 @@
     "@next/mdx": "^15",
     "@tailwindcss/postcss": "^4.1.15",
     "@tailwindcss/typography": "^0.5.16",
+    "@types/mdast": "^4.0.4",
     "@types/webpack-env": "^1.18.8",
     "cheerio": "^1.1.2",
     "clsx": "^2.1.1",
@@ -33,7 +35,8 @@
     "react-dom": "^19",
     "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.1.15",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "@content-collections/core": "^0.13.0",
@@ -53,6 +56,7 @@
     "sharp": "0.34.3",
     "ts-node": "^10.9.2",
     "turndown": "^7.2.2",
+    "vfile": "^6.0.3",
     "zod": "^4.2.1"
   }
 }
