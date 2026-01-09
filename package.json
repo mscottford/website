@@ -12,6 +12,7 @@
     "copy:images": "ts-node --esm ./scripts/copy-post-images.ts",
     "generate:redirects": "ts-node --esm ./scripts/generate-s3-redirects.ts",
     "test:redirects": "ts-node --esm ./scripts/test-redirects.ts",
+    "test:rss": "ts-node --esm ./scripts/test-rss-feed.ts",
     "deploy:build:staging": "NEXT_PUBLIC_SITE_URL=https://staging.mscottford.com pnpm build",
     "deploy:terraform:staging": "cd deploy/terraform && tofu apply -auto-approve",
     "deploy:staging": "pnpm deploy:build:staging && pnpm generate:redirects && pnpm deploy:terraform:staging",
