@@ -28,12 +28,12 @@ Implement a feature flag or similar capability to control the visibility of unfi
 
 These items are currently visible on the site and need to be updated before launch:
 
-- [ ] `src/app/layout.tsx` - Site metadata
-  - [ ] Page title template (currently "Spencer Sharp")
-  - [ ] Meta description
+- [x] `src/app/layout.tsx` - Site metadata
+  - [x] Page title template (currently "Spencer Sharp")
+  - [x] Meta description
 
-- [ ] `src/components/Footer.tsx`
-  - [ ] Copyright name (currently "Spencer Sharp")
+- [x] `src/components/Footer.tsx`
+  - [x] Copyright name (currently "Spencer Sharp")
 
 ## Old Content Import
 

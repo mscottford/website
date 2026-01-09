@@ -21,6 +21,7 @@ import { ArrowDownIcon } from '@/components/icons/ArrowDownIcon'
 import { SocialLink } from '@/components/SocialLink'
 import { iconsByName } from '@/lib/icons'
 import { showHiddenContent } from '@/lib/showHiddenContent'
+import { SnippetContent } from '@/components/SnippetContent'
 
 function Article({ article }: { article: Post }) {
   return (
@@ -192,16 +193,9 @@ export default async function Home() {
           <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
             Software mender, legacy code whisperer, speaker, instructor.
           </h1>
-          <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-            I’m Scott, a software engineer with a passion for improving and
-            maintaining existing codebases. With over a decade of experience, I
-            specialize in wrangling legacy systems to enhance scalability,
-            stability, and sustainability. When I’m not coding, you’ll find me
-            sharing my knowledge in various formats, including the{' '}
-            {/* TODO: This link isn't showing up as underlined. */}
-            <Link href="https://legacycode.rocks">Legacy Code Rocks</Link>{' '}
-            community/podcast, conference talks, and on this site.
-          </p>
+          <div className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
+            <SnippetContent name="teaser" />
+          </div>
           <SocialLinks />
         </div>
       </Container>

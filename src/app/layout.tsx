@@ -2,6 +2,7 @@ import { type Metadata } from 'next'
 
 import { Providers } from '@/app/providers'
 import { Layout } from '@/components/Layout'
+import { getSnippetPlain } from '@/lib/snippets'
 
 import '@/styles/tailwind.css'
 
@@ -11,8 +12,7 @@ export const metadata: Metadata = {
     template: '%s - M. Scott Ford',
     default: 'M. Scott Ford - Software engineer and founder',
   },
-  description:
-    "I'm Scott, a software engineer and entrepreneur. I help teams improve their software delivery practices and build better products.",
+  description: getSnippetPlain('teaser'),
   alternates: {
     types: {
       'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL}/feed.xml`,

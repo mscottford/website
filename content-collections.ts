@@ -70,6 +70,25 @@ const navItems = defineCollection({
   }),
 });
 
+const snippets = defineCollection({
+  name: 'snippets',
+  directory: './content/snippets',
+  include: '**/*.yaml',
+  parser: 'yaml',
+  schema: z.object({
+    name: z.string(),
+    content: z.string(),
+  }),
+  transform: async (snippet) => {
+    // Remove markdown links, keeping just the link text
+    const plainContent = snippet.content.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    return {
+      ...snippet,
+      plainContent,
+    }
+  },
+});
+
 export default defineConfig({
-  collections: [posts, socialLinks, navItems],
+  collections: [posts, socialLinks, navItems, snippets],
 });
