@@ -46,6 +46,8 @@ resource "aws_s3_bucket_website_configuration" "static_site" {
   error_document {
     key = "404.html"
   }
+
+  routing_rules = file("${path.module}/s3-routing-rules.json")
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access" {

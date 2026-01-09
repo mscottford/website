@@ -275,7 +275,7 @@ S3 supports native HTTP 301 redirects via routing rules - proper SEO-friendly re
   console.log(JSON.stringify({ RoutingRules: rules }, null, 2));
   ```
 
-- [ ] **Apply S3 routing rules via Terraform** - Integrate generated routing rules into Terraform configuration
+- [x] **Apply S3 routing rules via Terraform** - Integrate generated routing rules into Terraform configuration
 
 **Note:** S3 routing rules are processed sequentially. More specific rules should come before general rules.
 

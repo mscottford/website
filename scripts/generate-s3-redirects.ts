@@ -3,11 +3,14 @@
  *
  * Usage: pnpm exec ts-node --esm scripts/generate-s3-redirects.ts
  *
- * Output can be used with:
- *   aws s3api put-bucket-website --bucket mscottford.com --website-configuration file://s3-website-config.json
+ * Outputs:
+ *   - deploy/terraform/s3-routing-rules.json (for Terraform)
+ *   - Also prints rules to stdout for verification
  */
 
-import { allPosts } from 'content-collections'
+import { allPosts } from '../.content-collections/generated/index.js'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 
 interface S3RoutingRule {
   Condition: { KeyPrefixEquals: string }
@@ -44,10 +47,17 @@ rules.push(
   }
 )
 
-const config = {
-  IndexDocument: { Suffix: 'index.html' },
-  ErrorDocument: { Key: '404.html' },
-  RoutingRules: rules,
-}
+// Write routing rules JSON for Terraform
+const outputPath = path.join(
+  import.meta.dirname,
+  '../deploy/terraform/s3-routing-rules.json'
+)
+fs.writeFileSync(outputPath, JSON.stringify(rules, null, 2))
 
-console.log(JSON.stringify(config, null, 2))
+console.log(`Generated ${rules.length} routing rules`)
+console.log(`Written to: ${outputPath}`)
+console.log('')
+console.log('Rules:')
+for (const rule of rules) {
+  console.log(`  /${rule.Condition.KeyPrefixEquals}* -> /${rule.Redirect.ReplaceKeyWith}`)
+}

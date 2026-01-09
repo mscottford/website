@@ -1,2 +1,3 @@
 .terraform/
 *.tfstate*
+s3-routing-rules.json
