@@ -9,7 +9,7 @@ This section documents the work that needs to be completed before launching the 
 - [x] Fix image loading on blog posts - the keyboard hacks post has broken images
 - [ ] Update all placeholder content that is not in a "hidden" state (see Placeholder Content section)
 - [ ] Complete all items from the Deployment sections (Terraform, GitHub Actions)
-- [ ] Add link on homepage below article list to view all articles
+- [x] Add link on homepage below article list to view all articles
 - [ ] Test RSS feed migration to ensure existing subscribers are not disrupted
 - [ ] Test S3 redirects to ensure all old URLs redirect properly
 - [ ] Remove newsletter signup functionality. We are not using this feature.
