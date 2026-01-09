@@ -12,7 +12,7 @@ This section documents the work that needs to be completed before launching the 
 - [x] Add link on homepage below article list to view all articles
 - [ ] Test RSS feed migration to ensure existing subscribers are not disrupted
 - [ ] Test S3 redirects to ensure all old URLs redirect properly
-- [ ] Remove newsletter signup functionality. We are not using this feature.
+- [x] Remove newsletter signup functionality. We are not using this feature.
 - [ ] Remove duplicate titles from imported Tumblr posts - the title appears both in frontmatter and as the first H1 in the content
 
 ### Hidden Content
@@ -428,9 +428,6 @@ This section tracks placeholder content from the Tailwind UI Spotlight template 
 - [ ] `src/app/layout.tsx` - Site metadata
   - [ ] Page title template ("Spencer Sharp")
   - [ ] Meta description
-
-- [ ] `src/app/thank-you/page.tsx` - Newsletter confirmation
-  - [ ] Thank you message text
 
 ### Components
 
