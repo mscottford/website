@@ -14,6 +14,7 @@ This section documents the work that needs to be completed before launching the 
 - [ ] Test S3 redirects to ensure all old URLs redirect properly
 - [x] Remove newsletter signup functionality. We are not using this feature.
 - [x] Remove duplicate titles from imported Tumblr posts - the title appears both in frontmatter and as the first H1 in the content
+- [x] Make footer navigation links dynamic - currently hardcoded, should use nav items from content-collections and respect hidden flag
 
 ### Hidden Content
 
