@@ -205,7 +205,11 @@ export default async function Home() {
           <SocialLinks />
         </div>
       </Container>
-      {showHiddenContent() && <Photos />}
+      {showHiddenContent() && (
+        <div className="outline-1 outline-dashed outline-purple-500">
+          <Photos />
+        </div>
+      )}
       <Container className="mt-24 md:mt-28">
         <div
           className={clsx(
@@ -238,7 +242,7 @@ export default async function Home() {
             </Link>
           </div>
           {showHiddenContent() && (
-            <div className="space-y-10 lg:pl-8 xl:pl-24">
+            <div className="space-y-10 lg:pl-8 xl:pl-24 outline-1 outline-dashed outline-purple-500 rounded">
               <Resume />
             </div>
           )}

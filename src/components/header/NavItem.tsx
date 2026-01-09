@@ -7,9 +7,11 @@ import clsx from 'clsx'
 export function NavItem({
   href,
   children,
+  outlined,
 }: {
   href: string
   children: React.ReactNode
+  outlined?: boolean
 }) {
   let isActive = usePathname() === href
 
@@ -22,6 +24,7 @@ export function NavItem({
           isActive
             ? 'text-teal-500 dark:text-teal-400'
             : 'hover:text-teal-500 dark:hover:text-teal-400',
+          outlined && 'outline-1 outline-dashed outline-purple-500 rounded',
         )}
       >
         {children}
