@@ -108,30 +108,29 @@ resource "aws_s3_object" "website_files" {
   content_type = lookup(local.content_type_map, try(regex("[^.]+$", each.value), ""), "application/octet-stream")
 }
 
-resource "aws_cloudfront_origin_access_control" "s3_oac" {
-  name                              = "s3-oac"
-  description                       = "Access Control for S3 bucket"
-  origin_access_control_origin_type = "s3"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
-}
-
 resource "aws_cloudfront_distribution" "cdn" {
+  # Use S3 website endpoint as custom origin to support routing rules (redirects)
   origin {
-    domain_name = aws_s3_bucket.static_site.bucket_regional_domain_name
-    origin_id   = "s3-static-site-origin"
+    domain_name = aws_s3_bucket_website_configuration.static_site.website_endpoint
+    origin_id   = "s3-website-origin"
 
-    origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only" # S3 website endpoints only support HTTP
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
   }
 
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
+  aliases             = ["staging.${var.domain_name}"]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "s3-static-site-origin"
+    target_origin_id = "s3-website-origin"
 
     forwarded_values {
       query_string = false
@@ -146,7 +145,9 @@ resource "aws_cloudfront_distribution" "cdn" {
   price_class = "PriceClass_100"
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = aws_acm_certificate_validation.staging.certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   restrictions {
@@ -171,7 +172,41 @@ data "aws_route53_zone" "main" {
   private_zone = false
 }
 
-resource "aws_route53_record" "www" {
+# ACM certificate for staging subdomain (must be in us-east-1 for CloudFront)
+resource "aws_acm_certificate" "staging" {
+  domain_name       = "staging.${var.domain_name}"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# DNS validation record for the certificate
+resource "aws_route53_record" "staging_cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.staging.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.main.zone_id
+}
+
+# Wait for certificate validation
+resource "aws_acm_certificate_validation" "staging" {
+  certificate_arn         = aws_acm_certificate.staging.arn
+  validation_record_fqdns = [for record in aws_route53_record.staging_cert_validation : record.fqdn]
+}
+
+resource "aws_route53_record" "staging" {
   zone_id = data.aws_route53_zone.main.zone_id
   name    = "staging.${var.domain_name}"
   type    = "A"
