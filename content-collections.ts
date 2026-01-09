@@ -66,6 +66,7 @@ const navItems = defineCollection({
   schema: z.object({
     label: z.string(),
     href: z.string(),
+    hidden: z.boolean().optional(),
   }),
 });
 

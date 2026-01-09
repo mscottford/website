@@ -19,9 +19,9 @@ This section documents the work that needs to be completed before launching the 
 
 Implement a feature flag or similar capability to control the visibility of unfinished content. The content should be visible when running a development server but hidden in production builds until ready.
 
-- [ ] Hide the nav links for the about, projects, speaking, and uses pages until content is added
-- [ ] Hide the resume section on the homepage until the about page is done
-- [ ] Hide the photo section on the homepage until real photos are addeds
+- [x] Hide the nav links for the about, projects, speaking, and uses pages until content is added
+- [x] Hide the resume section on the homepage until the about page is done
+- [x] Hide the photo section on the homepage until real photos are added
 
 ### Visible Placeholder Content
 

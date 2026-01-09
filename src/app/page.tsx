@@ -20,6 +20,7 @@ import { BriefcaseIcon } from '@/components/icons/BriefcaseIcon'
 import { ArrowDownIcon } from '@/components/icons/ArrowDownIcon'
 import { SocialLink } from '@/components/SocialLink'
 import { iconsByName } from '@/lib/icons'
+import { showHiddenContent } from '@/lib/showHiddenContent'
 
 function Article({ article }: { article: Post }) {
   return (
@@ -204,9 +205,14 @@ export default async function Home() {
           <SocialLinks />
         </div>
       </Container>
-      <Photos />
+      {showHiddenContent() && <Photos />}
       <Container className="mt-24 md:mt-28">
-        <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2">
+        <div
+          className={clsx(
+            'grid max-w-xl grid-cols-1 gap-y-20',
+            showHiddenContent() && 'mx-auto lg:max-w-none lg:grid-cols-2',
+          )}
+        >
           <div className="flex flex-col gap-16">
             {articles.map((article) => (
               <Article key={article.slug} article={article} />
@@ -231,9 +237,11 @@ export default async function Home() {
               </svg>
             </Link>
           </div>
-          <div className="space-y-10 lg:pl-8 xl:pl-24">
-            <Resume />
-          </div>
+          {showHiddenContent() && (
+            <div className="space-y-10 lg:pl-8 xl:pl-24">
+              <Resume />
+            </div>
+          )}
         </div>
       </Container>
     </>
