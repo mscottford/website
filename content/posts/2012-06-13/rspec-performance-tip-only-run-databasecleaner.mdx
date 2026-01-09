@@ -14,7 +14,7 @@ I have a rspec performance tip to share. Before you get all excited you should t
 
 If you answered yes to all of those questions, then you probably have something similar to this block in your `spec_helper.rb`.
 
-```
+```ruby
 config.before(:each) do
   DatabaseCleaner.start
 end
@@ -30,7 +30,7 @@ The trick is to only perform these statements when needed. Here’s how.
 
 Update your `rspec_helper.rb` file to look more like this.
 
-```
+```ruby
 config.before(:each) do
   DatabaseCleaner.start if example.metadata[:db]
 end
@@ -44,14 +44,14 @@ Then run your test suite. You should notice some failures that weren’t there b
 
 There are a couple ways to do that. You can do it to a single spec with
 
-```
+```ruby
 it 'should have a clean db', :db => true do
 end
 ```
 
 Or you can add it to an entire context with
 
-```
+```ruby
 context 'uses the database', :db => true do
   it 'should have a clean db' do
   end
@@ -60,7 +60,7 @@ end
 
 And you can even add the metadata to a `describe` block with
 
-```
+```ruby
 describe AwesomeModel, :db => true do
 end
 ```

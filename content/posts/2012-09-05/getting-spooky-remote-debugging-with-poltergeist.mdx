@@ -14,7 +14,7 @@ I saw that remote debugging was [supposed to work on Mac OS X](https://github.co
 
 Poltergeist is configured with an executable that wil launch a browser. I had trouble running `/Application/Google Chrome.app/Contents/MacOS/Google Chrome`, so I had to create a shell script that invokes `open /Applications/Google Chrome.app`. Here’s what it looks like.
 
-```
+```bash
 #!/bin/bash
 open '/Applications/Google Chrome.app' $@
 ```
@@ -25,13 +25,13 @@ I named this file `chrome.sh` and made it executable with `chmod +x chrome.sh`.
 
 Change
 
-```
+```ruby
 Capybara.javascript_driver = :poltergeist
 ```
 
 to
 
-```
+```ruby
 Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app, :inspector => './chrome.sh', :js_errors => true)
 end

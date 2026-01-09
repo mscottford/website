@@ -12,7 +12,7 @@ In Delphi, functions had an implicitly defined variable named `result` that was 
 
 This meant that I wrote a **ton** of code that looked something like this.
 
-```
+```pascal
 function Lookup(search: String): TExample
 begin
   result := Null;
@@ -25,7 +25,7 @@ end
 
 I remember finding this to be a crazy annoying restriction when I was first presented with it. I found it doubly weird that it was basically enforced by the language. In my university computer science program, we used C/C++, and I had developed a personal style that looked more like this.
 
-```
+```cpp
 Example* Lookup(string search) {
   if (search == 'trivial') {
     return new Example();
@@ -37,7 +37,7 @@ Example* Lookup(string search) {
 
 After a couple of months, I found myself writing C++ code that looked something like this instead.
 
-```
+```cpp
 Example* Lookup(string search) {
   Example* result = null;
 
@@ -51,7 +51,7 @@ Example* Lookup(string search) {
 
 And ever since, that style has stuck with me. I used it when I wrote C#, Java, PHP and more. Even (_gasp_) Ruby. Idiomatic Ruby would probably look something like this.
 
-```
+```ruby
 def lookup(value)
   if value == 'trivial'
     Example.new
@@ -61,7 +61,7 @@ end
 
 But I still find myself wanting to write this instead.
 
-```
+```ruby
 def lookup(value)
   result = nil
 

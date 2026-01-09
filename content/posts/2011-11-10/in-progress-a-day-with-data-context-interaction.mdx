@@ -20,7 +20,7 @@ I’ve been working on a lot of shopping cart solutions lately, and Authorize.Ne
 
 Here’s what the initializer looked like before I sunk my teeth in it to fix an issue.
 
-```
+```ruby
 # Use Heroku ENV variables for Authorize.net CIM credentials when present.  No need to include yml in the git repository.
 if ENV['AUTHORIZE_NET_CIM_LOGIN'] && ENV['AUTHORIZE_NET_CIM_PASSWORD'] && ENV['AUTHORIZE_NET_CIM_VALIDATION_MODE'] && ENV['AUTHORIZE_NET_CIM_GATEWAY_MODE']
   AUTHORIZE_NET_CIM_CREDENTIALS = { login:          ENV['AUTHORIZE_NET_CIM_LOGIN'],
@@ -45,7 +45,7 @@ So, now we need to change this. In Heroku, this file is throwing an exception wh
 
 Ugh. The TDD practitioner in me really wants to write a test for this. But how can I easily invoke the code in this file? I know, I’ll use what I learned at CVREG and move this logic into a context. Here’s what the initializer looks like after doing so.
 
-```
+```ruby
 require 'contexts/authorize_net_initializing'
 
 AUTHORIZE_NET_CIM_CREDENTIALS = AuthorizeNetInitializing.new(
@@ -57,7 +57,7 @@ Okay. That’s simple enough. I still don’t really know what’s going on by l
 
 So, what’s the `AuthorizeNetInitializing` class look like you ask? Well, let’s write some tests to determine how it should look. I can’t show you what these tests looked like before, because they just did not exist.
 
-```
+```ruby
 require 'spec_helper_no_rails'
 
 require 'contexts/authorize_net_initializing'
@@ -128,7 +128,7 @@ TODO: Write a description of what’s going on here.
 
 Cool. What’s the code look like that makes that pass?
 
-```
+```ruby
 require 'yaml'
 
 class AuthorizeNetInitializing
@@ -205,7 +205,7 @@ TODO: Write a description that steps through what’s going on in that sample.
 
 Now let’s add a test to handle what happens on Heroku when `rake assets:precompile` is run.
 
-```
+```ruby
 context 'config file is missing' do
       before :each do
         require 'rspec/mocks'
@@ -228,7 +228,7 @@ context 'config file is missing' do
 
 Oh. Shiny! What makes that pass?
 
-```
+```ruby
 require 'yaml'
 
 class AuthorizeNetInitializing

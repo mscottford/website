@@ -38,13 +38,13 @@ On your production server, start taps with a command that looks like this:
 
 For mysql:
 
-```
+```bash
 taps server mysql://dbuser:dbpassword@localhost/dbname tapsuser tapspassword
 ```
 
 Or for postgres:
 
-```
+```bash
 taps server postgress://dbuser:dbpassword@localhost/dbname tapsuser tapspassword
 ```
 
@@ -54,7 +54,7 @@ That’ll boot the server on port 5000. It runs with http authentication using t
 
 Now you can use the client to pull the production database down to your development environment. Here’s what it looks like if you’re using sqlite for development.
 
-```
+```bash
 taps pull sqlite://db/production_copy.sqlite3 http://tapsuser:tapspassword@production.server.com:5000
 ```
 
