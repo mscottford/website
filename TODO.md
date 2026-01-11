@@ -363,13 +363,16 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
   - Configure `monthly_budget` in tfvars (default $10)
   - All project resources tagged with `Project` and `Environment` for cost tracking
 
-- [ ] **SSL/TLS certificate** - Use ACM for custom domain HTTPS
-  - Request ACM certificate for `mscottford.com` and `*.mscottford.com`
-  - Update CloudFront to use custom certificate instead of default
+- [x] **SSL/TLS certificate** - ACM certificates for custom domain HTTPS
+  - Separate certificates per environment (site + www)
+  - DNS validation via Route 53
+  - CloudFront configured with TLS 1.2 minimum, SNI-only
 
-- [ ] **CloudFront cache behaviors** - Optimize caching per content type
-  - Long cache for static assets (images, fonts)
-  - Short/no cache for HTML/JS/CSS and feed.xml
+- [x] **CloudFront cache behaviors** - Optimize caching per content type
+  - `_next/static/*`: 1 year cache (hashed filenames = immutable)
+  - `images/*`: 30 days cache
+  - `feed.xml`: No cache (always fresh for subscribers)
+  - Default (HTML): 1 day cache, max 7 days
 
 ### Deployment Automation (GitHub Actions)
 

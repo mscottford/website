@@ -350,9 +350,85 @@ resource "aws_cloudfront_distribution" "cdn" {
       }
     }
 
+    # Default: 1 day cache for HTML pages
+    min_ttl     = 0
+    default_ttl = 86400      # 1 day
+    max_ttl     = 604800     # 7 days
+
     viewer_protocol_policy = "redirect-to-https"
 
     # Associate CloudFront Function for redirects and URL rewriting
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.redirects.arn
+    }
+  }
+
+  # Long cache for Next.js static assets (hashed filenames = immutable)
+  ordered_cache_behavior {
+    path_pattern     = "_next/static/*"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "s3-origin"
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 31536000   # 1 year
+    default_ttl = 31536000   # 1 year
+    max_ttl     = 31536000   # 1 year
+    compress    = true
+
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # Long cache for images
+  ordered_cache_behavior {
+    path_pattern     = "images/*"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "s3-origin"
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 2592000    # 30 days
+    default_ttl = 2592000    # 30 days
+    max_ttl     = 31536000   # 1 year
+    compress    = true
+
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # No cache for RSS feed (always fresh for subscribers)
+  ordered_cache_behavior {
+    path_pattern     = "feed.xml"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "s3-origin"
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0          # No cache
+    max_ttl     = 3600       # Max 1 hour if origin sets cache headers
+    compress    = true
+
+    viewer_protocol_policy = "redirect-to-https"
+
     function_association {
       event_type   = "viewer-request"
       function_arn = aws_cloudfront_function.redirects.arn
