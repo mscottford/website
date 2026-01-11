@@ -27,6 +27,17 @@ moved {
   to   = aws_route53_record.site_cert_validation
 }
 
+# Migrate renamed S3 bucket resources (for OAC migration)
+moved {
+  from = aws_s3_bucket_public_access_block.public_access
+  to   = aws_s3_bucket_public_access_block.static_site
+}
+
+moved {
+  from = aws_s3_bucket_policy.public_policy
+  to   = aws_s3_bucket_policy.static_site
+}
+
 # =============================================================================
 # Terraform State Bucket (shared across environments)
 # =============================================================================
@@ -66,7 +77,7 @@ data "aws_route53_zone" "main" {
 }
 
 # =============================================================================
-# Static Site S3 Bucket
+# Static Site S3 Bucket (Private - accessed only via CloudFront OAC)
 # =============================================================================
 
 resource "aws_s3_bucket" "static_site" {
@@ -78,42 +89,39 @@ resource "aws_s3_bucket" "static_site" {
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "static_site" {
+# Block all public access - CloudFront OAC will be used instead
+resource "aws_s3_bucket_public_access_block" "static_site" {
   bucket = aws_s3_bucket.static_site.id
 
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "404.html"
-  }
-
-  routing_rules = file("${path.module}/s3-routing-rules.json")
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_public_access_block" "public_access" {
-  bucket = aws_s3_bucket.static_site.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_policy" "public_policy" {
+# Bucket policy allowing only CloudFront OAC access
+resource "aws_s3_bucket_policy" "static_site" {
   bucket = aws_s3_bucket.static_site.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Sid       = "PublicReadGetObject"
+      Sid       = "AllowCloudFrontServicePrincipal"
       Effect    = "Allow"
-      Principal = "*"
-      Action    = "s3:GetObject"
-      Resource  = "${aws_s3_bucket.static_site.arn}/*"
+      Principal = {
+        Service = "cloudfront.amazonaws.com"
+      }
+      Action   = "s3:GetObject"
+      Resource = "${aws_s3_bucket.static_site.arn}/*"
+      Condition = {
+        StringEquals = {
+          "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn
+        }
+      }
     }]
   })
+
+  depends_on = [aws_s3_bucket_public_access_block.static_site]
 }
 
 # =============================================================================
@@ -190,32 +198,63 @@ resource "aws_acm_certificate_validation" "site" {
 }
 
 # =============================================================================
+# CloudFront Origin Access Control (OAC)
+# =============================================================================
+
+resource "aws_cloudfront_origin_access_control" "static_site" {
+  name                              = "${local.site_bucket_name}-oac"
+  description                       = "OAC for ${local.hostname} static site"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
+# =============================================================================
+# CloudFront Function for Redirects and URL Rewriting
+# =============================================================================
+
+resource "aws_cloudfront_function" "redirects" {
+  name    = "${var.environment}-redirects"
+  runtime = "cloudfront-js-2.0"
+  comment = "Handle redirects and add index.html for directory requests"
+  publish = true
+  code    = file("${path.module}/cloudfront-redirects.js")
+}
+
+# =============================================================================
 # CloudFront Distribution for Site
 # =============================================================================
 
 resource "aws_cloudfront_distribution" "cdn" {
-  # Use S3 website endpoint as custom origin to support routing rules (redirects)
+  # Use S3 bucket with OAC (private bucket access)
   origin {
-    domain_name = aws_s3_bucket_website_configuration.static_site.website_endpoint
-    origin_id   = "s3-website-origin"
-
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only" # S3 website endpoints only support HTTP
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
+    domain_name              = aws_s3_bucket.static_site.bucket_regional_domain_name
+    origin_id                = "s3-origin"
+    origin_access_control_id = aws_cloudfront_origin_access_control.static_site.id
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  default_root_object = "index.html"
-  aliases             = [local.hostname]
+  enabled         = true
+  is_ipv6_enabled = true
+  aliases         = [local.hostname]
+
+  # Custom error response for 404s
+  custom_error_response {
+    error_code         = 404
+    response_code      = 404
+    response_page_path = "/404.html"
+  }
+
+  # Custom error response for 403s (S3 returns 403 for missing objects with OAC)
+  custom_error_response {
+    error_code         = 403
+    response_code      = 404
+    response_page_path = "/404.html"
+  }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "s3-website-origin"
+    target_origin_id = "s3-origin"
 
     forwarded_values {
       query_string = false
@@ -225,6 +264,12 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
 
     viewer_protocol_policy = "redirect-to-https"
+
+    # Associate CloudFront Function for redirects and URL rewriting
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.redirects.arn
+    }
   }
 
   price_class = "PriceClass_100"

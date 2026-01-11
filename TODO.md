@@ -340,10 +340,11 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
   - Route 53 A records for www subdomains
   - Redirects: `www.staging.mscottford.com` → `staging.mscottford.com`, `www.mscottford.com` → `mscottford.com`
 
-- [ ] **Make S3 buckets private** - Currently public; should use CloudFront OAC exclusively
-  - Remove public access block settings
-  - Update bucket policy to only allow CloudFront OAC access
-  - Ensure content is only accessible via CloudFront URLs
+- [x] **Make S3 buckets private** - Uses CloudFront OAC exclusively
+  - S3 bucket blocks all public access
+  - Bucket policy allows only CloudFront service principal with SourceArn condition
+  - CloudFront Function handles redirects and adds /index.html for directory requests
+  - Direct S3 access returns 403 Forbidden
 
 - [ ] **Enable S3 versioning for static site buckets** - For rollback capability
   - Add `aws_s3_bucket_versioning` resource for static site bucket
@@ -411,9 +412,9 @@ Automate the build and deploy process via GitHub Actions and Terraform.
 
 Items to consider for a production-ready deployment:
 
-- [ ] **CloudFront error pages** - Custom error responses:
+- [x] **CloudFront error pages** - Custom error responses configured:
   - 404 → `/404.html` with 404 status
-  - 403 → `/404.html` with 404 status (S3 returns 403 for missing files)
+  - 403 → `/404.html` with 404 status (S3 returns 403 for missing files with OAC)
 
 - [ ] **Terraform state locking** - Add DynamoDB table for state locking
   - Prevents concurrent modifications

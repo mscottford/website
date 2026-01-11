@@ -13,14 +13,14 @@ output "s3_bucket" {
   value       = aws_s3_bucket.static_site.bucket
 }
 
-output "s3_website_url" {
-  description = "The S3 website endpoint URL"
-  value       = "http://${aws_s3_bucket_website_configuration.static_site.website_endpoint}"
-}
-
 output "cloudfront_domain_name" {
   description = "The CloudFront distribution domain name"
   value       = aws_cloudfront_distribution.cdn.domain_name
+}
+
+output "cloudfront_function_name" {
+  description = "The CloudFront Function name for redirects"
+  value       = aws_cloudfront_function.redirects.name
 }
 
 output "cloudfront_distribution_id" {
