@@ -24,19 +24,6 @@ variable "domain_name" {
   default     = "mscottford.com"
 }
 
-variable "alert_phone" {
-  description = "Phone number for cost alerts in E.164 format, e.g. +12065551234 (set via TF_VAR_alert_phone environment variable)"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
-variable "monthly_budget" {
-  description = "Monthly budget threshold in USD for cost alerts"
-  type        = number
-  default     = 10
-}
-
 # =============================================================================
 # Derived Values
 # =============================================================================

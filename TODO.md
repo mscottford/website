@@ -316,21 +316,52 @@ S3 supports native HTTP 301 redirects via routing rules - proper SEO-friendly re
 
 Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S3 for static hosting and CloudFront for CDN/HTTPS.
 
-**Current infrastructure (`deploy/terraform/`):**
+**Directory structure:**
+```
+deploy/terraform/
+├── bootstrap/           # Shared resources (tfstate bucket, budget alerts)
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── backend.tf
+│   └── secrets.auto.tfvars (gitignored - contains alert_phone)
+├── main.tf              # Per-environment resources (S3, CloudFront, DNS)
+├── variables.tf
+├── backend.tf
+├── staging.tfvars
+└── production.tfvars
+```
+
+**State files (in S3 `mscottford.com-tfstate`):**
+- `bootstrap/terraform.tfstate` - Shared resources
+- `staging/terraform.tfstate` - Staging environment
+- `production/terraform.tfstate` - Production environment
+
+**Deployment commands:**
+- `pnpm deploy:staging` - Full staging deploy (runs bootstrap first)
+- `pnpm deploy:production` - Full production deploy (runs bootstrap first)
+- `pnpm deploy:plan:staging` - Preview staging changes
+- `pnpm deploy:plan:production` - Preview production changes
+- `pnpm deploy:bootstrap` - Apply shared infrastructure only
+
+**Bootstrap resources (shared across environments):**
 - [x] S3 bucket for Terraform state with versioning and encryption
 - [x] S3 backend configuration for remote state
-- [x] S3 bucket for static site (staging environment)
+- [x] Cost budget and SNS alerts
+
+**Per-environment resources:**
+- [x] S3 bucket for static site
 - [x] S3 bucket website configuration (index.html, 404.html)
 - [x] CloudFront distribution with Origin Access Control (OAC)
-- [x] Route 53 A record for `staging.mscottford.com`
+- [x] Route 53 A records
 - [x] Automatic content-type detection based on file extension
 
-**Infrastructure improvements needed:**
+**Infrastructure improvements completed:**
 
-- [x] **Production deployment support** - Add ability to deploy to either:
+- [x] **Production deployment support** - Deploy to either environment:
   - Staging: `staging.mscottford.com` via `pnpm deploy:staging`
   - Production: `mscottford.com` via `pnpm deploy:production`
-  - Uses separate tfvars files and S3 state keys for isolation
+  - Separate state files per environment prevent cross-environment conflicts
   - Preview changes with `pnpm deploy:plan:staging` or `pnpm deploy:plan:production`
 
 - [x] **www redirect** - Add redirect from `www.mscottford.com` to `mscottford.com`
@@ -357,10 +388,11 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
   - Public access blocked on logging bucket
 
 - [x] **Cost budget alarm** - Alert if project costs exceed monthly budget
+  - Managed in `bootstrap/` (shared across environments)
   - AWS Budget tracking only resources tagged with `Project=mscottford-website`
-  - SMS notifications via SNS (set `TF_VAR_alert_phone` env var in E.164 format)
+  - SMS notifications via SNS (set `alert_phone` in `bootstrap/secrets.auto.tfvars`)
   - Alerts at 80% of budget, 100% forecasted, and 100% actual
-  - Configure `monthly_budget` in tfvars (default $10)
+  - Configure `monthly_budget` in `bootstrap/variables.tf` (default $10)
   - All project resources tagged with `Project` and `Environment` for cost tracking
 
 - [x] **SSL/TLS certificate** - ACM certificates for custom domain HTTPS
