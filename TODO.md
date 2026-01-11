@@ -327,14 +327,18 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
 
 **Infrastructure improvements needed:**
 
-- [ ] **Production deployment support** - Add ability to deploy to either:
-  - Staging: `staging.mscottford.com`
-  - Production: `mscottford.com` (apex domain)
-  - Consider using Terraform workspaces or separate tfvars files
+- [x] **Production deployment support** - Add ability to deploy to either:
+  - Staging: `staging.mscottford.com` via `pnpm deploy:staging`
+  - Production: `mscottford.com` via `pnpm deploy:production`
+  - Uses separate tfvars files and S3 state keys for isolation
+  - Preview changes with `pnpm deploy:plan:staging` or `pnpm deploy:plan:production`
 
-- [ ] **www redirect** - Add redirect from `www.mscottford.com` to `mscottford.com`
-  - Create S3 bucket for www redirect or use CloudFront function
-  - Add Route 53 record for www subdomain
+- [x] **www redirect** - Add redirect from `www.mscottford.com` to `mscottford.com`
+  - S3 buckets configured for redirect (staging and production)
+  - CloudFront distributions for HTTPS support
+  - ACM certificates with DNS validation
+  - Route 53 A records for www subdomains
+  - Redirects: `www.staging.mscottford.com` → `staging.mscottford.com`, `www.mscottford.com` → `mscottford.com`
 
 - [ ] **Make S3 buckets private** - Currently public; should use CloudFront OAC exclusively
   - Remove public access block settings
