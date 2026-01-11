@@ -25,6 +25,8 @@
     "deploy:production": "pnpm deploy:build:production && pnpm generate:redirects && pnpm deploy:init:production && pnpm deploy:terraform:production",
     "rollback:staging": "ts-node --esm ./scripts/rollback-deployment.ts mscottford.com-staging",
     "rollback:production": "ts-node --esm ./scripts/rollback-deployment.ts mscottford.com-production",
+    "logs:staging": "ts-node --esm ./scripts/tail-access-logs.ts mscottford.com-staging-logs",
+    "logs:production": "ts-node --esm ./scripts/tail-access-logs.ts mscottford.com-production-logs",
     "prestart": "pnpm run build:favicons",
     "start": "pnpm dlx serve@latest out",
     "lint": "next lint"

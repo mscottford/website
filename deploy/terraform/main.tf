@@ -68,6 +68,63 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
 }
 
 # =============================================================================
+# CloudFront Access Logs Bucket
+# =============================================================================
+
+resource "aws_s3_bucket" "logs" {
+  bucket = "${local.site_bucket_name}-logs"
+
+  tags = {
+    Name        = "CloudFront Access Logs"
+    Environment = local.environment_tag
+  }
+}
+
+# Grant CloudFront permission to write logs
+resource "aws_s3_bucket_ownership_controls" "logs" {
+  bucket = aws_s3_bucket.logs.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "logs" {
+  bucket     = aws_s3_bucket.logs.id
+  acl        = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.logs]
+}
+
+# Block public access to logs
+resource "aws_s3_bucket_public_access_block" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Lifecycle rules for cost control:
+# - Expire logs after 14 days (staging) or 30 days (production)
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    id     = "expire-old-logs"
+    status = "Enabled"
+
+    expiration {
+      days = var.environment == "production" ? 30 : 14
+    }
+
+    # Also clean up incomplete multipart uploads
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
+}
+
+# =============================================================================
 # Route 53 Zone (shared data source)
 # =============================================================================
 
@@ -261,6 +318,13 @@ resource "aws_cloudfront_distribution" "cdn" {
   enabled         = true
   is_ipv6_enabled = true
   aliases         = [local.hostname]
+
+  # Access logging configuration
+  logging_config {
+    bucket          = aws_s3_bucket.logs.bucket_domain_name
+    prefix          = "cloudfront/"
+    include_cookies = false
+  }
 
   # Custom error response for 404s
   custom_error_response {

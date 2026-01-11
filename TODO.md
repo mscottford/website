@@ -350,11 +350,11 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
   - Versioning enabled on static site bucket
   - Lifecycle rule expires old versions after 30 days, but always keeps at least 2 previous versions
 
-- [ ] **Enable access logging** - For traffic analysis and debugging
-  - Create logging S3 bucket
-  - Enable CloudFront access logs
-  - Enable S3 access logs
-  - Consider log retention lifecycle policies
+- [x] **Enable access logging** - For traffic analysis and debugging
+  - Dedicated logging S3 bucket per environment
+  - CloudFront access logs enabled (S3 logs skipped - redundant with OAC)
+  - Cost controls: logs expire after 14 days (staging) or 30 days (production)
+  - Public access blocked on logging bucket
 
 - [ ] **CloudWatch cost alarm** - Alert if website costs exceed $10/month
   - Create CloudWatch billing alarm
@@ -366,8 +366,8 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
   - Update CloudFront to use custom certificate instead of default
 
 - [ ] **CloudFront cache behaviors** - Optimize caching per content type
-  - Long cache for static assets (JS, CSS, images, fonts)
-  - Short/no cache for HTML and feed.xml
+  - Long cache for static assets (images, fonts)
+  - Short/no cache for HTML/JS/CSS and feed.xml
 
 ### Deployment Automation (GitHub Actions)
 
