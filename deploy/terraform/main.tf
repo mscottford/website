@@ -74,10 +74,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
 resource "aws_s3_bucket" "logs" {
   bucket = "${local.site_bucket_name}-logs"
 
-  tags = {
-    Name        = "CloudFront Access Logs"
-    Environment = local.environment_tag
-  }
+  tags = merge(local.common_tags, {
+    Name = "CloudFront Access Logs"
+  })
 }
 
 # Grant CloudFront permission to write logs
@@ -140,10 +139,9 @@ data "aws_route53_zone" "main" {
 resource "aws_s3_bucket" "static_site" {
   bucket = local.site_bucket_name
 
-  tags = {
-    Name        = "StaticSite"
-    Environment = local.environment_tag
-  }
+  tags = merge(local.common_tags, {
+    Name = "StaticSite"
+  })
 }
 
 # Enable versioning for rollback capability
@@ -375,10 +373,9 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
-  tags = {
-    Name        = "S3-CloudFront-CDN"
-    Environment = local.environment_tag
-  }
+  tags = merge(local.common_tags, {
+    Name = "S3-CloudFront-CDN"
+  })
 }
 
 # =============================================================================
@@ -406,10 +403,9 @@ resource "aws_route53_record" "site" {
 resource "aws_s3_bucket" "www_redirect" {
   bucket = local.www_bucket_name
 
-  tags = {
-    Name        = "WWW Redirect"
-    Environment = local.environment_tag
-  }
+  tags = merge(local.common_tags, {
+    Name = "WWW Redirect"
+  })
 }
 
 # Configure the bucket to redirect all requests to the main hostname
@@ -503,10 +499,9 @@ resource "aws_cloudfront_distribution" "www_redirect" {
     }
   }
 
-  tags = {
-    Name        = "WWW-Redirect-CDN"
-    Environment = local.environment_tag
-  }
+  tags = merge(local.common_tags, {
+    Name = "WWW-Redirect-CDN"
+  })
 }
 
 # Route 53 A record for www subdomain
@@ -519,5 +514,89 @@ resource "aws_route53_record" "www" {
     name                   = aws_cloudfront_distribution.www_redirect.domain_name
     zone_id                = "Z2FDTNDATAQYW2" # CloudFront's hosted zone ID
     evaluate_target_health = false
+  }
+}
+
+# =============================================================================
+# Cost Budget (Project-specific - tracks only tagged resources)
+# Created when TF_VAR_alert_phone environment variable is set
+# =============================================================================
+
+# SNS topic for budget alerts
+resource "aws_sns_topic" "budget_alerts" {
+  count = var.alert_phone != "" ? 1 : 0
+  name  = "mscottford-website-budget-alerts"
+
+  tags = merge(local.common_tags, {
+    Name = "Budget Alerts"
+  })
+}
+
+# SNS topic policy to allow AWS Budgets to publish
+resource "aws_sns_topic_policy" "budget_alerts" {
+  count  = var.alert_phone != "" ? 1 : 0
+  arn    = aws_sns_topic.budget_alerts[0].arn
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "AllowBudgetsPublish"
+      Effect    = "Allow"
+      Principal = {
+        Service = "budgets.amazonaws.com"
+      }
+      Action   = "SNS:Publish"
+      Resource = aws_sns_topic.budget_alerts[0].arn
+    }]
+  })
+}
+
+# SMS subscription for budget alerts
+resource "aws_sns_topic_subscription" "budget_alerts_sms" {
+  count     = var.alert_phone != "" ? 1 : 0
+  topic_arn = aws_sns_topic.budget_alerts[0].arn
+  protocol  = "sms"
+  endpoint  = var.alert_phone
+}
+
+# AWS Budget tracking only resources tagged with Project = "mscottford-website"
+resource "aws_budgets_budget" "monthly" {
+  count        = var.alert_phone != "" ? 1 : 0
+  name         = "mscottford-website-monthly"
+  budget_type  = "COST"
+  limit_amount = tostring(var.monthly_budget)
+  limit_unit   = "USD"
+  time_unit    = "MONTHLY"
+
+  # Filter to only track resources with our project tag
+  cost_filter {
+    name   = "TagKeyValue"
+    values = ["Project$mscottford-website"]
+  }
+
+  # Alert at 80% of budget
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = 80
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
+    subscriber_sns_topic_arns  = [aws_sns_topic.budget_alerts[0].arn]
+  }
+
+  # Alert when forecast exceeds budget
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = 100
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "FORECASTED"
+    subscriber_sns_topic_arns  = [aws_sns_topic.budget_alerts[0].arn]
+  }
+
+  # Alert when actual exceeds budget
+  notification {
+    comparison_operator        = "GREATER_THAN"
+    threshold                  = 100
+    threshold_type             = "PERCENTAGE"
+    notification_type          = "ACTUAL"
+    subscriber_sns_topic_arns  = [aws_sns_topic.budget_alerts[0].arn]
   }
 }

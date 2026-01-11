@@ -24,6 +24,19 @@ variable "domain_name" {
   default     = "mscottford.com"
 }
 
+variable "alert_phone" {
+  description = "Phone number for cost alerts in E.164 format, e.g. +12065551234 (set via TF_VAR_alert_phone environment variable)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "monthly_budget" {
+  description = "Monthly budget threshold in USD for cost alerts"
+  type        = number
+  default     = 10
+}
+
 # =============================================================================
 # Derived Values
 # =============================================================================
@@ -43,4 +56,10 @@ locals {
 
   # Site URL for build
   site_url = "https://${local.hostname}"
+
+  # Common tags applied to all resources for cost tracking
+  common_tags = {
+    Project     = "mscottford-website"
+    Environment = local.environment_tag
+  }
 }

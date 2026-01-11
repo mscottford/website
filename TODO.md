@@ -356,10 +356,12 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
   - Cost controls: logs expire after 14 days (staging) or 30 days (production)
   - Public access blocked on logging bucket
 
-- [ ] **CloudWatch cost alarm** - Alert if website costs exceed $10/month
-  - Create CloudWatch billing alarm
-  - Include all related resources: S3 storage, CloudFront data transfer, Route 53 queries, CloudWatch logs
-  - Set up SNS topic for notifications
+- [x] **Cost budget alarm** - Alert if project costs exceed monthly budget
+  - AWS Budget tracking only resources tagged with `Project=mscottford-website`
+  - SMS notifications via SNS (set `TF_VAR_alert_phone` env var in E.164 format)
+  - Alerts at 80% of budget, 100% forecasted, and 100% actual
+  - Configure `monthly_budget` in tfvars (default $10)
+  - All project resources tagged with `Project` and `Environment` for cost tracking
 
 - [ ] **SSL/TLS certificate** - Use ACM for custom domain HTTPS
   - Request ACM certificate for `mscottford.com` and `*.mscottford.com`

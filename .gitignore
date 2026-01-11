@@ -52,3 +52,9 @@ next-env.d.ts
 
 # JetBrains IDEs
 /.idea/
+
+# Terraform secrets and local state
+deploy/terraform/secrets.auto.tfvars
+deploy/terraform/*.tfstate
+deploy/terraform/*.tfstate.backup
+deploy/terraform/.terraform/
