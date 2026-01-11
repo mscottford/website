@@ -7,10 +7,10 @@ This document outlines various tasks and improvements.
 This section documents the work that needs to be completed before launching the new site.
 
 - [x] Fix image loading on blog posts - the keyboard hacks post has broken images
-- [ ] Update all placeholder content that is not in a "hidden" state (see Placeholder Content section)
+- [x] Update all placeholder content that is not in a "hidden" state (see Placeholder Content section)
 - [ ] Complete all items from the Deployment sections (Terraform, GitHub Actions)
 - [x] Add link on homepage below article list to view all articles
-- [ ] Test RSS feed migration to ensure existing subscribers are not disrupted (see RSS Feed Test Results below)
+- [x] Test RSS feed migration to ensure existing subscribers are not disrupted (see RSS Feed Test Results below)
 - [x] Test S3 redirects to ensure all old URLs redirect properly (23/23 passed on staging)
 - [x] Remove newsletter signup functionality. We are not using this feature.
 - [x] Remove duplicate titles from imported Tumblr posts - the title appears both in frontmatter and as the first H1 in the content
@@ -459,14 +459,14 @@ This section tracks placeholder content from the Tailwind UI Spotlight template 
   - [ ] Page intro text
   - [ ] All tool/software recommendations
 
-- [ ] `src/app/layout.tsx` - Site metadata
-  - [ ] Page title template ("Spencer Sharp")
-  - [ ] Meta description
+- [x] `src/app/layout.tsx` - Site metadata
+  - [x] Page title template ("Spencer Sharp")
+  - [x] Meta description
 
 ### Components
 
-- [ ] `src/components/Footer.tsx`
-  - [ ] Copyright name ("Spencer Sharp")
+- [x] `src/components/Footer.tsx`
+  - [x] Copyright name ("Spencer Sharp")
 
 ### Images
 

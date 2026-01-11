@@ -22,6 +22,7 @@ import { SocialLink } from '@/components/SocialLink'
 import { iconsByName } from '@/lib/icons'
 import { showHiddenContent } from '@/lib/showHiddenContent'
 import { SnippetContent } from '@/components/SnippetContent'
+import { Snippet } from 'next/dist/compiled/@next/font/dist/google'
 
 function Article({ article }: { article: Post }) {
   return (
@@ -191,7 +192,7 @@ export default async function Home() {
       <Container className="mt-8 sm:mt-16">
         <div className="max-w-2xl">
           <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
-            Software mender, legacy code whisperer, speaker, instructor.
+            <SnippetContent name="tagline" />
           </h1>
           <div className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
             <SnippetContent name="teaser" />

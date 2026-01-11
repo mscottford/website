@@ -7,10 +7,13 @@ import { getSnippetPlain } from '@/lib/snippets'
 import '@/styles/tailwind.css'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://mscottford.com'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://mscottford.com',
+  ),
   title: {
     template: '%s - M. Scott Ford',
-    default: 'M. Scott Ford - Software engineer and founder',
+    default:
+      `M. Scott Ford - ${getSnippetPlain('tagline')}`,
   },
   description: getSnippetPlain('teaser'),
   alternates: {
