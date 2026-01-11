@@ -23,6 +23,8 @@
     "deploy:plan:production": "pnpm deploy:init:production && cd deploy/terraform && tofu plan -var-file=production.tfvars",
     "deploy:staging": "pnpm deploy:build:staging && pnpm generate:redirects && pnpm deploy:init:staging && pnpm deploy:terraform:staging",
     "deploy:production": "pnpm deploy:build:production && pnpm generate:redirects && pnpm deploy:init:production && pnpm deploy:terraform:production",
+    "rollback:staging": "ts-node --esm ./scripts/rollback-deployment.ts mscottford.com-staging",
+    "rollback:production": "ts-node --esm ./scripts/rollback-deployment.ts mscottford.com-production",
     "prestart": "pnpm run build:favicons",
     "start": "pnpm dlx serve@latest out",
     "lint": "next lint"

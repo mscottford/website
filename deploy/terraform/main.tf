@@ -89,6 +89,31 @@ resource "aws_s3_bucket" "static_site" {
   }
 }
 
+# Enable versioning for rollback capability
+resource "aws_s3_bucket_versioning" "static_site" {
+  bucket = aws_s3_bucket.static_site.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Lifecycle rule to expire old versions after 30 days, but keep at least 2
+resource "aws_s3_bucket_lifecycle_configuration" "static_site" {
+  bucket = aws_s3_bucket.static_site.id
+
+  rule {
+    id     = "expire-old-versions"
+    status = "Enabled"
+
+    noncurrent_version_expiration {
+      noncurrent_days          = 30
+      newer_noncurrent_versions = 2
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.static_site]
+}
+
 # Block all public access - CloudFront OAC will be used instead
 resource "aws_s3_bucket_public_access_block" "static_site" {
   bucket = aws_s3_bucket.static_site.id

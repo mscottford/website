@@ -346,9 +346,9 @@ Infrastructure is managed via Terraform in `deploy/terraform/`. The setup uses S
   - CloudFront Function handles redirects and adds /index.html for directory requests
   - Direct S3 access returns 403 Forbidden
 
-- [ ] **Enable S3 versioning for static site buckets** - For rollback capability
-  - Add `aws_s3_bucket_versioning` resource for static site bucket
-  - Consider lifecycle rules to expire old versions
+- [x] **Enable S3 versioning for static site buckets** - For rollback capability
+  - Versioning enabled on static site bucket
+  - Lifecycle rule expires old versions after 30 days, but always keeps at least 2 previous versions
 
 - [ ] **Enable access logging** - For traffic analysis and debugging
   - Create logging S3 bucket
