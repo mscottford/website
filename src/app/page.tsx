@@ -200,11 +200,7 @@ export default async function Home() {
           <SocialLinks />
         </div>
       </Container>
-      {showHiddenContent() && (
-        <div className="outline-1 outline-dashed outline-purple-500">
-          <Photos />
-        </div>
-      )}
+      <Photos />
       <Container className="mt-24 md:mt-28">
         <div
           className={clsx(

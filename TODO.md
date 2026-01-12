@@ -525,11 +525,11 @@ This section tracks placeholder content from the Tailwind UI Spotlight template 
 
 - [x] `src/images/avatar.jpg` - Profile avatar
 - [ ] `src/images/portrait.jpg` - About page portrait
-- [ ] `src/images/photos/image-1.jpg` - Homepage carousel
-- [ ] `src/images/photos/image-2.jpg` - Homepage carousel
-- [ ] `src/images/photos/image-3.jpg` - Homepage carousel
-- [ ] `src/images/photos/image-4.jpg` - Homepage carousel
-- [ ] `src/images/photos/image-5.jpg` - Homepage carousel
+- [x] `src/images/photos/image-1.jpg` - Homepage carousel
+- [x] `src/images/photos/image-2.jpg` - Homepage carousel
+- [x] `src/images/photos/image-3.jpg` - Homepage carousel
+- [x] `src/images/photos/image-4.jpg` - Homepage carousel
+- [x] `src/images/photos/image-5.jpg` - Homepage carousel
 - [ ] `src/images/logos/airbnb.svg` - Resume logo
 - [ ] `src/images/logos/facebook.svg` - Resume logo
 - [ ] `src/images/logos/starbucks.svg` - Resume logo
