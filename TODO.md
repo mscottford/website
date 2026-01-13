@@ -6,6 +6,8 @@ This document outlines various tasks and improvements.
 
 This section documents the work needed to add a `/calendar` page that embeds my Google Calendar [booking page](https://calendar.google.com/calendar/appointments/AcZssZ0EFa_TmSZ9nLkdwvGbx0fq2GJcAhnjyizOdYQ=). If Google provides an API for embedding it into a page, then I want to utilize that. Otherwise, I want to simply redirect to the booking url provided above.
 
+The site should contain no links to the calendar page.
+
 - [ ] Research embedding options for Google Calendar booking pages via web search
 - [ ] Option 1: Utilize embedding API to render booking details within site design and branding
 - [ ] Option 2: HTTP redirect to https://calendar.google.com/calendar/appointments/AcZssZ0EFa_TmSZ9nLkdwvGbx0fq2GJcAhnjyizOdYQ=
