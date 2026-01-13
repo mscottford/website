@@ -2,6 +2,15 @@
 
 This document outlines various tasks and improvements.
 
+## Calendar Page
+
+This section documents the work needed to add a `/calendar` page that embeds my Google Calendar [booking page](CALENDAR_BOOKING_URL_REDACTED). If Google provides an API for embedding it into a page, then I want to utilize that. Otherwise, I want to simply redirect to the booking url provided above.
+
+- [ ] Research embedding options for Google Calendar booking pages via web search
+- [ ] Option 1: Utilize embedding API to render booking details within site design and branding
+- [ ] Option 2: HTTP redirect to CALENDAR_BOOKING_URL_REDACTED
+- [ ] Option 3: Meta tag refresh redirect to CALENDAR_BOOKING_URL_REDACTED
+
 ## Launch Plan
 
 This section documents the work that needs to be completed before launching the new site.
