@@ -32,7 +32,9 @@
     "logs:production": "ts-node --esm ./scripts/tail-access-logs.ts mscottford.com-production-logs",
     "prestart": "pnpm run build:favicons",
     "start": "pnpm dlx serve@latest out",
-    "lint": "next lint"
+    "lint": "next lint",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
@@ -59,24 +61,38 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^5.0.0",
     "@content-collections/core": "^0.13.0",
     "@content-collections/next": "^0.2.10",
+    "@storybook/addon-a11y": "^10.1.11",
+    "@storybook/addon-docs": "^10.1.11",
+    "@storybook/addon-onboarding": "^10.1.11",
+    "@storybook/addon-vitest": "^10.1.11",
+    "@storybook/nextjs-vite": "^10.1.11",
     "@types/mdx": "^2.0.13",
     "@types/node": "^24.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/turndown": "^5.0.6",
+    "chromatic": "^13.3.5",
     "eslint": "^9.32.0",
     "eslint-config-next": "^15",
+    "eslint-plugin-storybook": "^10.1.11",
     "favicons": "^7.2.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx-frontmatter": "^5.2.0",
     "sharp": "0.34.3",
+    "storybook": "^10.1.11",
     "ts-node": "^10.9.2",
     "turndown": "^7.2.2",
     "vfile": "^6.0.3",
     "zod": "^4.2.1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
   }
 }
