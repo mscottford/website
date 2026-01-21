@@ -2,17 +2,6 @@
 
 This document outlines various tasks and improvements.
 
-## Calendar Page
-
-This section documents the work needed to add a `/calendar` page that embeds my Google Calendar booking page. The booking URL is stored in the `CALENDAR_BOOKING_URL` environment variable (see `.env` file). If Google provides an API for embedding it into a page, then I want to utilize that. Otherwise, I want to simply redirect to the booking URL.
-
-The site should contain no links to the calendar page.
-
-- [ ] Research embedding options for Google Calendar booking pages via web search
-- [ ] Option 1: Utilize embedding API to render booking details within site design and branding
-- [ ] Option 2: HTTP redirect to the booking URL from the environment variable
-- [ ] Option 3: Meta tag refresh redirect to the booking URL from the environment variable
-
 ## Old Content Import
 
 This section tracks the work that needs to be done to import old content from https://mscottford.com.

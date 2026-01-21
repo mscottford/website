@@ -6,6 +6,15 @@ This document archives completed tasks from the project TODO list.
 
 The site has been successfully launched at https://mscottford.com.
 
+## Calendar Page (2026-01-20)
+
+Added a `/calendar` page that embeds the Google Calendar booking page via iframe. The booking URL is stored in the `NEXT_PUBLIC_CALENDAR_BOOKING_URL` environment variable (see `.env` file).
+
+The site contains no links to the calendar page (accessible only via direct URL).
+
+- [x] Research embedding options for Google Calendar booking pages via web search
+- [x] Utilize iframe embedding to render booking calendar within site design
+
 ## Launch Plan
 
 - [x] Fix image loading on blog posts - the keyboard hacks post has broken images
