@@ -321,10 +321,10 @@ resource "aws_cloudfront_distribution" "cdn" {
       }
     }
 
-    # Default: 1 day cache for HTML pages
+    # No cache for HTML pages - always fetch fresh after deploy
     min_ttl     = 0
-    default_ttl = 86400      # 1 day
-    max_ttl     = 604800     # 7 days
+    default_ttl = 0          # No cache
+    max_ttl     = 86400      # Max 1 day if origin sets cache headers
 
     viewer_protocol_policy = "redirect-to-https"
 
@@ -335,7 +335,9 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
-  # Long cache for Next.js static assets (hashed filenames = immutable)
+  # No cache for Next.js static assets
+  # Even though these have hashed filenames, caching can cause issues if
+  # old HTML references chunks that were replaced in a new deploy
   ordered_cache_behavior {
     path_pattern     = "_next/static/*"
     allowed_methods  = ["GET", "HEAD"]
@@ -349,9 +351,9 @@ resource "aws_cloudfront_distribution" "cdn" {
       }
     }
 
-    min_ttl     = 31536000   # 1 year
-    default_ttl = 31536000   # 1 year
-    max_ttl     = 31536000   # 1 year
+    min_ttl     = 0
+    default_ttl = 0          # No cache
+    max_ttl     = 86400      # Max 1 day if origin sets cache headers
     compress    = true
 
     viewer_protocol_policy = "redirect-to-https"
@@ -377,6 +379,62 @@ resource "aws_cloudfront_distribution" "cdn" {
     compress    = true
 
     viewer_protocol_policy = "redirect-to-https"
+  }
+
+  # Short cache for JavaScript files (same as HTML)
+  # This catches any JS files NOT in _next/static/ (which is matched first above)
+  ordered_cache_behavior {
+    path_pattern     = "*.js"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "s3-origin"
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0          # No cache - always fetch fresh
+    max_ttl     = 86400      # Max 1 day if origin sets cache headers
+    compress    = true
+
+    viewer_protocol_policy = "redirect-to-https"
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.redirects.arn
+    }
+  }
+
+  # Short cache for CSS files (same as HTML)
+  # This catches any CSS files NOT in _next/static/ (which is matched first above)
+  ordered_cache_behavior {
+    path_pattern     = "*.css"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "s3-origin"
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0          # No cache - always fetch fresh
+    max_ttl     = 86400      # Max 1 day if origin sets cache headers
+    compress    = true
+
+    viewer_protocol_policy = "redirect-to-https"
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.redirects.arn
+    }
   }
 
   # No cache for RSS feed (always fresh for subscribers)
@@ -423,6 +481,39 @@ resource "aws_cloudfront_distribution" "cdn" {
   tags = merge(local.common_tags, {
     Name = "S3-CloudFront-CDN"
   })
+}
+
+# =============================================================================
+# CloudFront Cache Invalidation
+# Invalidates all content after deployment using /* wildcard
+# =============================================================================
+
+# Compute hash from local files (stable during apply, unlike S3 etags)
+locals {
+  files_hash = sha256(jsonencode({
+    for f in fileset("../../out", "**/*") : f => filemd5("../../out/${f}")
+  }))
+}
+
+action "aws_cloudfront_create_invalidation" "cache" {
+  config {
+    distribution_id = aws_cloudfront_distribution.cdn.id
+    paths           = ["/*"]
+  }
+}
+
+resource "terraform_data" "invalidation_trigger" {
+  input = local.files_hash
+
+  # Ensure all S3 uploads complete before this resource is evaluated
+  depends_on = [aws_s3_object.website_files]
+
+  lifecycle {
+    action_trigger {
+      events  = [after_create, after_update]
+      actions = [action.aws_cloudfront_create_invalidation.cache]
+    }
+  }
 }
 
 # =============================================================================
