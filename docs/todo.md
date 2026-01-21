@@ -235,3 +235,160 @@ This section tracks placeholder content from the Tailwind UI Spotlight template 
 - [ ] `src/images/logos/cosmos.svg` - Project logo
 - [ ] `src/images/logos/helio-stream.svg` - Project logo
 - [ ] `src/images/logos/open-shuttle.svg` - Project logo
+
+## Image Optimization
+
+This section documents the work needed to implement on-demand image optimization using CloudFront, Lambda, and S3, integrated with Next.js via a custom image loader.
+
+### Overview
+
+Since this site uses Next.js static export (`output: 'export'`), the default Next.js Image Optimization API is not available. Instead, we'll deploy a serverless image optimization service on AWS that transforms images on-demand and serves them from `assets.mscottford.com`.
+
+**Reference architecture:** [AWS Blog: Image Optimization using Amazon CloudFront and AWS Lambda](https://aws.amazon.com/blogs/networking-and-content-delivery/image-optimization-using-amazon-cloudfront-and-aws-lambda/)
+
+### Architecture
+
+```
+User Request
+     ↓
+CloudFront (assets.mscottford.com)
+     ↓
+CloudFront Function (normalize request, select format from Accept header)
+     ↓
+Origin Shield (regional cache layer)
+     ↓
+S3 (transformed images bucket)
+     ↓ (on 403/miss)
+Origin Failover → Lambda Function URL
+                       ↓
+                  Download original from S3
+                       ↓
+                  Transform with Sharp (resize, format conversion)
+                       ↓
+                  Store transformed image in S3
+                       ↓
+                  Return image (cached by CloudFront)
+```
+
+### Request URL Format
+
+```
+https://assets.mscottford.com/images/example.jpg?format=auto&width=300&quality=80
+```
+
+**Supported parameters:**
+- `width` - Target width in pixels
+- `quality` - Image quality (1-100, optional)
+- `format` - Output format: `jpeg`, `webp`, `avif`, or `auto` (auto selects best format based on browser Accept header)
+
+### Next.js Integration
+
+With static export, Next.js requires a [custom image loader](https://nextjs.org/docs/app/guides/static-exports#image-optimization). The loader function receives `src`, `width`, and `quality` parameters and returns the optimized image URL.
+
+**Configuration in `next.config.mjs`:**
+```js
+const nextConfig = {
+  output: 'export',
+  images: {
+    loader: 'custom',
+    loaderFile: './src/lib/image-loader.ts',
+  },
+}
+```
+
+**Custom loader (`src/lib/image-loader.ts`):**
+```ts
+export default function imageLoader({
+  src,
+  width,
+  quality,
+}: {
+  src: string
+  width: number
+  quality?: number
+}) {
+  const params = new URLSearchParams({
+    width: width.toString(),
+    format: 'auto',
+  })
+  if (quality) {
+    params.set('quality', quality.toString())
+  }
+  return `https://assets.mscottford.com${src}?${params.toString()}`
+}
+```
+
+### Infrastructure (Terraform)
+
+All infrastructure will be managed via Terraform in `deploy/terraform/`. Based on the [AWS image-optimization sample](https://github.com/aws-samples/image-optimization), the following resources are needed:
+
+**S3 Buckets:**
+- Original images bucket (source)
+- Transformed images bucket (cache) with lifecycle policy (90-day expiration)
+
+**Lambda Function:**
+- Runtime: Node.js with Sharp library (ARM64 for cost efficiency)
+- Function URL enabled for CloudFront Origin Failover
+- Memory: 1024MB minimum (Sharp requires significant memory)
+- Timeout: 15-30 seconds
+- IAM role with S3 read/write permissions
+
+**CloudFront Distribution:**
+- Custom domain: `assets.mscottford.com`
+- ACM certificate (in us-east-1)
+- Origin 1: S3 transformed images bucket
+- Origin 2 (failover): Lambda Function URL
+- Origin Group: Failover from S3 to Lambda on 403
+- Origin Shield: Enabled (reduces Lambda invocations)
+- CloudFront Function: Viewer request handler for URL normalization and format selection
+- Cache policy: Long TTL (1 year) with query string forwarding
+- Origin Access Control (OAC) for secure S3 access
+
+**Route 53:**
+- A record alias for `assets.mscottford.com` → CloudFront distribution
+
+### Implementation Tasks
+
+#### Terraform Infrastructure
+
+- [ ] **Create S3 buckets** - Original images and transformed images buckets with appropriate policies
+- [ ] **Create Lambda function** - Image transformation function using Sharp
+  - [ ] Bundle Sharp library for ARM64 Lambda
+  - [ ] Implement transformation logic (resize, format conversion)
+  - [ ] Configure Function URL
+  - [ ] Set up IAM role with S3 permissions
+- [ ] **Create CloudFront Function** - URL normalization and format selection based on Accept header
+- [ ] **Create CloudFront distribution** - With origin group failover configuration
+  - [ ] Configure `assets.mscottford.com` custom domain
+  - [ ] Request/import ACM certificate in us-east-1
+  - [ ] Set up Origin Access Control for S3
+  - [ ] Configure Origin Shield
+  - [ ] Set up origin group with failover behavior
+- [ ] **Create Route 53 record** - A record alias for `assets.mscottford.com`
+- [ ] **Add S3 lifecycle policy** - Auto-delete transformed images after 90 days
+
+#### Next.js Integration
+
+- [ ] **Create custom image loader** - `src/lib/image-loader.ts` pointing to `assets.mscottford.com`
+- [ ] **Update next.config.mjs** - Configure custom loader for static export
+- [ ] **Update existing `<img>` tags** - Replace with Next.js `<Image>` component where appropriate
+
+#### Image Migration
+
+- [ ] **Upload original images to S3** - Sync images from `public/` and post content directories
+- [ ] **Update image paths** - Ensure paths work with the new loader
+- [ ] **GitHub Actions integration** - Sync images to S3 during deployment
+
+### Caching Strategy
+
+- **CloudFront edge cache:** 1 year TTL for transformed images
+- **Origin Shield:** Regional cache layer to reduce Lambda invocations
+- **S3 storage:** Transformed images stored with 90-day lifecycle policy
+- **Browser cache:** `Cache-Control: max-age=31536000, immutable` for optimized images
+
+### Cost Considerations
+
+- Lambda invocations only occur on cache miss (first request for each size/format combination)
+- Origin Shield reduces duplicate Lambda invocations from different edge locations
+- S3 lifecycle policy prevents unbounded storage growth
+- CloudFront caching minimizes origin requests
