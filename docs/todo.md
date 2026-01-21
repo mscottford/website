@@ -13,45 +13,6 @@ The site should contain no links to the calendar page.
 - [ ] Option 2: HTTP redirect to CALENDAR_BOOKING_URL_REDACTED
 - [ ] Option 3: Meta tag refresh redirect to CALENDAR_BOOKING_URL_REDACTED
 
-## Launch Plan
-
-This section documents the work that needs to be completed before launching the new site.
-
-- [ ] Complete all items from the Deployment sections (Terraform, GitHub Actions)
-
-### RSS Feed Test Results
-
-**How to run the test:**
-
-```bash
-pnpm test:rss https://mscottford.com/rss https://staging.mscottford.com/feed.xml
-```
-
-The script compares the production RSS feed (baseline) with the staging feed (new) and detects changes that would impact existing subscribers. Posts older than 7 days that appear as "new" will cause the test to fail.
-
-**Test Results (2026-01-09):**
-
-| Category | Count | Status |
-|----------|-------|--------|
-| Old posts appearing as NEW | 1 | FAILURE |
-| Genuinely new items | 0 | - |
-| Posts removed from feed | 19 | Info |
-| Posts modified | 1 | Warning |
-
-**Issues to address:**
-
-1. **"First Post" would appear as NEW** - This test post (dated 2025-12-24) exists in staging but not in production. It would show up as a new item to existing subscribers. Either remove this post before launch or accept that it will appear as new.
-
-2. **19 posts removed from feed** - The old Tumblr feed has 20 items, but the staging feed only has 2. Many posts haven't been migrated yet, or the feed is intentionally limited.
-
-3. **"MacBook Pro Keyboard Hacks" link changed** - The link format changed from Tumblr URL (`/post/757620834301083648`) to the new format (`/articles/macbook-pro-keyboard-hacks-inspired-by`). The GUID matches so it won't appear as a new item, but the link change is noted.
-
-**To pass the test before launch:**
-
-- Remove or update the "First Post" test content
-- Ensure all migrated posts preserve their original Tumblr GUIDs in the feed
-- Re-run the test: `pnpm test:rss https://mscottford.com/rss https://staging.mscottford.com/feed.xml`
-
 ## Old Content Import
 
 This section tracks the work that needs to be done to import old content from https://mscottford.com.

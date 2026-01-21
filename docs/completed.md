@@ -2,6 +2,10 @@
 
 This document archives completed tasks from the project TODO list.
 
+## Site Launch (2026-01-20)
+
+The site has been successfully launched at https://mscottford.com.
+
 ## Launch Plan
 
 - [x] Fix image loading on blog posts - the keyboard hacks post has broken images
@@ -12,6 +16,7 @@ This document archives completed tasks from the project TODO list.
 - [x] Remove newsletter signup functionality. We are not using this feature.
 - [x] Remove duplicate titles from imported Tumblr posts - the title appears both in frontmatter and as the first H1 in the content
 - [x] Make footer navigation links dynamic - currently hardcoded, should use nav items from content-collections and respect hidden flag
+- [x] Complete all items from the Deployment sections (Terraform, GitHub Actions)
 
 ### Hidden Content
 
