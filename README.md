@@ -2,6 +2,11 @@
 
 This is the source code for my personal website, [mscottford.com](https://mscottford.com). It is built using Next.js.
 
+## Documentation
+
+- [Project TODOs](docs/todo.md) - Remaining work items and project roadmap
+- [Completed Work](docs/completed.md) - Archive of completed tasks
+
 ## License
 
 This site is based on the [Spotlight](https://tailwindcss.com/plus/templates/spotlight) template from [Tailwind Plus](https://tailwindcss.com/plus). Code from the template is published with this repository per the terms of the [Tailwind UI license](LICENSE-TailwindUI.md). Specifically this clause:

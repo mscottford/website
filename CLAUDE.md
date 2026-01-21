@@ -51,6 +51,7 @@ Posts are imported as `allPosts` from `content-collections` and rendered via dyn
 
 ## Development Notes
 
-- TODO.md contains detailed project roadmap and remaining work items
+- `docs/todo.md` contains detailed project roadmap and remaining work items
+- `docs/completed.md` archives completed tasks for reference
 - Favicon generation runs automatically before dev/build/start
 - Static export builds to `/out` directory - understand Next.js static export limitations
