@@ -1,0 +1,67 @@
+---
+title: "Is AI Tooling Biased Against Maintainability?"
+description: "Recent discussions have me wondering if biases against maintenance are becoming baked into the AI tools that we're using as developers."
+dateTime: "2026-07-20T20:30:00-04:00"
+---
+
+Software maintainability is a more important problem than it has ever been. Software systems are being generated dramatically faster than they have been in the past. But not all of that code is created equally.
+
+## Do agent harnesses have an anti-maintenance bias baked in?
+
+I’ve never had Claude Code suggest that it’s time to start creating unit tests. I’ve never had Claude Code suggest that a project should make use of a linter. I’ve never had it proactively address compiler warnings. I’ve yet to see it offer to upgrade outdated 3rd party dependencies.
+
+But I _have_ seen Claude Code shrug off an issue as being “preexisting”, seemingly trying to convince itself and me that a problem doesn’t need to be fixed. I _have_ seen it try to fix a failing test by simply changing the assertion. I _have_ seen it create exception handlers that do nothing, not even write out a warning message. I’ve also seen it argue that a defect doesn’t need to be fixed, because it would take a lot of work to fix it correctly.
+
+I’m starting to wonder if the teams that are creating the agent harnesses that we use are implicitly adding a bias _against_ maintenance activities into the tools.
+
+
+## An example and a problem
+
+I'm constantly amazed at how well Claude Code is able to generate a small script to tackle a task that I want automated. Through a few hours of back and forth, making refinements via a series of iterations, I'm able to craft powerful, single purpose scripts that would have taken me weeks to write without Claude Code's assistance. Its power is _real_.
+
+However, the bigger the script gets, the more capabilities that get added, the poorer things get. Claude Code does not do nearly as well at adding a feature or fixing a bug on a large project. The value vs time metric (that I haven't measured empirically) feels very stark when I compare how well Claude Code accomplishes a small, targeted, tightly scoped task on a very small codebase (or even one that doesn't exist yet) against an equally small, targeted, tightly scoped task on a large project.
+
+I feel that I even start to see Claude Code do worse as my initially small script grows in scope. When I realize that it would be a good foundation to build on. When I identify that there's another feature that I want the script to accomplish.
+
+## What’s the cause?
+
+I'm starting to wonder if this problem is just a micro-scale version of what I've seen most maker teams do over the years. The initial concept is easy to craft and validate. The system is thrown together quickly, with little thought to the kind of effort that’s going to be required to refine, improve, or maintain the system later. Just f’ing ship it.
+
+And at first, it works. Things move fast. It’s decently easy to add small features or to refine existing ones. The system hasn’t existed long enough to encounter any complicated maintenance challenges.
+
+But steadily, simple tasks become more and more difficult to accomplish. It becomes harder and harder to add new features, equally hard to make small tweaks. Existing functionality starts breaking, and it’s not obvious why, and it’s not always spotted before a new version ships.
+
+## Time for a rewrite?
+
+When I ran Corgibytes, a software consultancy that helped companies improve their software projects instead of starting over, this is the point when we would typically be called in to help on a project. The team had hit a tipping point where they were trying to decide if they should start over, or invest in cleaning up the successful mess that they created. Our bias was almost always in the direction of improving things without having to kick off a full-scale, stop the presses, rewrite. 
+
+Instead, we would advocate for small incremental improvements to guide the project in the direction that the team wanted it to go in. The final destination state was often that much of the project got rewritten, but along the way, we put guardrails in place to make it harder for the mess to rematerialize. The team essentially got the rewrite that they wanted initially, but we got there through small steps. We didn’t get there by taking a bulldozer to the project and starting over from scratch. And the end state was more maintainable than a bulldozing effort would have been, because we took the time to improve team practices as well.
+
+## What does better look like?
+
+When I ask for a change to one of my small scripts, I’d love for the agent harness to recognize that a complex change may break existing behavior and suggest that some pinning tests get created first. I’d like for it to notice that there are edge cases that the implementation isn’t handling well, such as by swallowing an exception, and encourage me to think about what should happen in those instances. I wish that it would create a test suite by default when it creates a new script. I hope that it will one day ask me about the practices that I would like it to follow while it’s doing its work.
+
+These are all things that I reach for when helping people clean up the mess that they have on their hands. And the practices are not new or novel. They just aren’t being followed by Claude Code when it writes software, not by default, anyway. It doesn’t create tests unless it’s explicitly told to when it creates a new project or makes a change to an existing one. And on existing projects, I see it often fail to recognize that the project has a test suite. It just starts making changes to the code under test without ever making any changes to the test suite at all, never even attempting to run it.
+
+## Which level of abstraction contains the issue?
+
+My thoughts along these lines have gotten me wondering about where in the stack the bias might lie. 
+
+Is it purely the harness and the prompts that it injects into the model to accomplish small tasks and built-in skills? There are some tools out there that attempt to let you peek behind the curtain and see all of the prompts that are built into the Claude Code harness. They are worth a read, if for no other reason than it’s helpful to see examples of how other people are attempting to guide the underlying models to get work done. However, through my casual reads, I haven’t noticed anything in those prompts that I would consider to be biasing the way the agents works against maintenance activities.
+
+But I’m not able to examine Claude Code’s source code. The way that information is flowing through the system, the way that data is being truncated, the way that the model might be encouraged to drive towards apparent completion. I can’t look at any of that.
+
+What about the model itself, then? Is it possible that the model has been trained on source code, software engineering literature, blog articles, and discussion forums that diminish the importance of software as a craft? I’d love to be able to see the data sets that are used to train the models, and the feedback mechanisms that are used to guide the weights during the training process. Unfortunately, that’s information that’s hidden for all of the frontier models that I know of. I suspect that there might be some more open models available. (If you know of any, get in touch and let me know how to try them out.)
+
+Agent harnesses like Claude Code mainly just operate as a black box. It’s really hard to look behind the scenes and get a sense of how things are wired together.
+
+## The path forward
+
+For now, I’ll have to continue attempting to add instructions to the `CLAUDE.md` file, and hope that they actually get honored. I’m also going to strengthen the guardrails that I have in place. I’m going to start introducing automated tests for the army of small utility scripts that I’m amassing. _I_ need to be proactive about these things, because the agent harness isn’t going to recognize that they need to be done. It seems to have a bias against doing so. I’m also going to continue to try and learn from others.
+
+## Giving credit where it’s due
+
+My friend Ray Myers recently wrote a great article that challenges some of the messaging (both explicit and implicit) that's coming from the most prominent AI tool vendors. The tool vendors seem to be saying that AI tooling is good enough at software development. So much so that dark factories might be all that you need to ship your next application. Ray's push back is that there are more subtle messages from those same AI tool vendors that point towards AI tooling _not_ being good enough at some specific software development activities.
+
+It was Ray’s article that got me thinking about the apparent bias that’s baked into tools like Claude Code. 
+
