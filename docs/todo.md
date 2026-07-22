@@ -88,56 +88,21 @@ The Tumblr site generates JSON-LD structured data for posts. The new site should
 
 - [ ] **Support per-article OG images** - Optional `ogImage` field in frontmatter for custom social images
 
-### Deployment Automation (GitHub Actions)
-
-Automate the build and deploy process via GitHub Actions and Terraform.
-
-**GitHub Actions workflows needed:**
-
-- [ ] **Staging deployment on PR** - Deploy preview to staging for pull requests
-  - Trigger on `pull_request` events
-  - Build the site with staging URL
-  - Run `terraform apply` for staging environment
-  - Comment on PR with staging URL
-
-- [ ] **Production deployment on merge** - Deploy to production when merging to `main`
-  - Trigger on `push` to `main` branch
-  - Build the site with production URL
-  - Run `terraform apply` for production environment
-  - Invalidate CloudFront cache
-
-- [ ] **Configure GitHub secrets/variables** - Add to repository settings:
-  - `AWS_ACCESS_KEY_ID` - IAM user/role access key
-  - `AWS_SECRET_ACCESS_KEY` - IAM user/role secret key
-  - Or use OIDC: `AWS_ROLE_ARN` for keyless authentication (recommended)
-
-- [ ] **Create IAM role for GitHub Actions** - With minimal permissions:
-  - S3: PutObject, GetObject, DeleteObject, ListBucket for site buckets
-  - CloudFront: CreateInvalidation, GetDistribution
-  - Route 53: ChangeResourceRecordSets (if DNS changes needed)
-  - Consider using OIDC provider for keyless auth (more secure)
-
-**Cache strategy:**
-- Static assets (JS, CSS, images): Long cache (`max-age=31536000, immutable`)
-- HTML files: Short cache with revalidation - CloudFront serves fresh content
-- RSS feed: No cache - Always fresh for feed readers
-
-**CloudFront invalidation notes:**
-- First 1,000 invalidation paths per month are free
-- Wildcard `/*` counts as one path
-- Invalidations typically complete in 1-2 minutes
-
 ### Additional Deployment Considerations
 
 Items to consider for a production-ready deployment:
 
-- [ ] **Terraform state locking** - Add DynamoDB table for state locking
-  - Prevents concurrent modifications
-  - Recommended for team environments or CI/CD
-
 - [ ] **Cache invalidation strategy** - More granular than `/*`:
   - Invalidate only changed paths on deploy
   - Reduces invalidation costs at scale
+
+### Linting
+
+- [ ] **Add an ESLint config** - `eslint` and `eslint-config-next` are installed but there is
+  no config file, so `pnpm lint` drops into `next lint`'s interactive setup prompt and exits
+  non-zero. Because of this there is no lint step in `.github/workflows/ci.yml`; add one once
+  a config exists. Note `next lint` itself is deprecated and removed in Next.js 16, so this
+  likely means migrating to the ESLint CLI.
 
 ### Other Considerations
 

@@ -309,11 +309,54 @@ deploy/terraform/
   - `feed.xml`: No cache (always fresh for subscribers)
   - Default (HTML): 1 day cache, max 7 days
 
+### Deployment Automation (GitHub Actions)
+
+Deploys run from GitHub Actions using OIDC. See `docs/github-actions.md` for the setup
+runbook and troubleshooting.
+
+- [x] **Create IAM role for GitHub Actions** - OIDC provider, role, and scoped policy in
+  `deploy/terraform/bootstrap/github-oidc.tf`. Trust policy restricts the token subject to
+  `refs/heads/main` and `pull_request` on `mscottford/website` - necessary because the repo
+  is public. No access keys are stored anywhere.
+
+- [x] **Configure GitHub secrets/variables** - Managed by bootstrap terraform via the
+  `integrations/github` provider, so a single `pnpm deploy:bootstrap` leaves the repo ready:
+  - `AWS_DEPLOY_ROLE_ARN` (variable) - the role ARN, not sensitive
+  - `NEXT_PUBLIC_CALENDAR_BOOKING_URL` (secret) - from the `calendar_booking_url` bootstrap
+    variable, set in the gitignored `bootstrap/secrets.auto.tfvars`
+
+- [x] **Staging deployment on PR** - `.github/workflows/deploy-staging.yml`. Skips fork PRs,
+  which get no secrets or OIDC token. Sticky-comments the staging URL read from the
+  `site_url` terraform output.
+
+- [x] **Production deployment on merge** - `.github/workflows/deploy-production.yml` on push
+  to `main`. CloudFront invalidation was already handled inside terraform by the
+  `aws_cloudfront_create_invalidation` action block, so no separate step was needed.
+
+- [x] **Build check on PRs** - `.github/workflows/ci.yml` builds the site and fails if
+  `deploy/terraform/cloudfront-redirects.js` is stale relative to `pnpm generate:redirects`.
+
+**Implementation notes:**
+
+- Shared deploy steps live in the reusable `.github/workflows/deploy.yml`, so staging and
+  production cannot drift apart.
+- CI uses new `deploy:ci:staging` / `deploy:ci:production` scripts rather than
+  `deploy:staging` / `deploy:production`. The latter run `deploy:bootstrap` first, and a
+  bootstrap apply from CI would see an empty `alert_phone` (it lives in a gitignored tfvars)
+  and destroy the cost alerting.
+- Checkouts use `fetch-depth: 0`. `content-collections.ts` derives each post's
+  `lastModifiedAt` from `git log -1 -- <file>`; at the default depth of 1 every post would
+  report HEAD's date, corrupting `dateModified` in the article JSON-LD.
+
 ### Additional Deployment Considerations
 
 - [x] **CloudFront error pages** - Custom error responses configured:
   - 404 → `/404.html` with 404 status
   - 403 → `/404.html` with 404 status (S3 returns 403 for missing files with OAC)
+
+- [x] **Terraform state locking** - Enabled S3-native locking (`use_lockfile = true` in
+  `deploy/terraform/backend.tf`) rather than a DynamoDB table, which is no longer needed.
+  GitHub Actions and local deploys are now two writers, so applies must serialize.
 
 ### Other Considerations
 

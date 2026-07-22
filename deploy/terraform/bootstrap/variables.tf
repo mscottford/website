@@ -34,6 +34,24 @@ variable "monthly_budget" {
   default     = 10
 }
 
+variable "github_repository" {
+  description = "GitHub repository as \"owner/repo\". Set to \"\" to skip creating the OIDC deploy role and managing repository settings."
+  type        = string
+  default     = "mscottford/website"
+
+  validation {
+    condition     = var.github_repository == "" || length(split("/", var.github_repository)) == 2
+    error_message = "github_repository must be in \"owner/repo\" form, or an empty string to disable."
+  }
+}
+
+variable "calendar_booking_url" {
+  description = "Google Calendar booking URL, published to GitHub as the NEXT_PUBLIC_CALENDAR_BOOKING_URL Actions secret (set via secrets.auto.tfvars or TF_VAR_calendar_booking_url). Copy the value from the root .env file."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 # =============================================================================
 # Derived Values
 # =============================================================================

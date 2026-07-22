@@ -1,0 +1,76 @@
+name: Deploy
+
+# Reusable deploy used by both deploy-staging.yml and deploy-production.yml, so
+# the two environments cannot drift apart. Staging only catches problems if it
+# runs through the same steps production does.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Target environment - "staging" or "production"
+        required: true
+        type: string
+    secrets:
+      calendar_booking_url:
+        description: Value for NEXT_PUBLIC_CALENDAR_BOOKING_URL, inlined into the static build
+        required: false
+    outputs:
+      site_url:
+        description: URL of the deployed site
+        value: ${{ jobs.deploy.outputs.site_url }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    outputs:
+      site_url: ${{ steps.outputs.outputs.site_url }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # content-collections.ts derives each post's lastModifiedAt from
+          # `git log -1 -- <file>`. At the default depth of 1 every post would
+          # report HEAD's date, corrupting dateModified in the article JSON-LD.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          # deploy/terraform/main.tf uses 1.14 `action` blocks for CloudFront
+          # invalidation; versions.tf requires >= 1.14.
+          terraform_version: 1.14.3
+          # The wrapper rewrites stdout, which breaks `terraform output -raw`.
+          terraform_wrapper: false
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: github-actions-${{ inputs.environment }}
+          aws-region: us-east-1
+
+      - run: pnpm install --frozen-lockfile
+
+      # Builds, regenerates the CloudFront redirect function, then applies the
+      # per-environment terraform. Deliberately not `pnpm deploy:${{ ... }}`:
+      # that variant runs bootstrap first, which would destroy the budget
+      # alerting because bootstrap's alert_phone lives in a gitignored tfvars.
+      - name: Build and apply
+        run: pnpm deploy:ci:${{ inputs.environment }}
+        env:
+          NEXT_PUBLIC_CALENDAR_BOOKING_URL: ${{ secrets.calendar_booking_url }}
+
+      - name: Read terraform outputs
+        id: outputs
+        working-directory: deploy/terraform
+        run: echo "site_url=$(terraform output -raw site_url)" >> "$GITHUB_OUTPUT"

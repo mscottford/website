@@ -22,3 +22,8 @@ output "budget_name" {
   description = "The name of the AWS Budget (empty if not configured)"
   value       = length(aws_budgets_budget.monthly) > 0 ? aws_budgets_budget.monthly[0].name : ""
 }
+
+output "github_actions_role_arn" {
+  description = "ARN of the role GitHub Actions assumes via OIDC (published to the repo as the AWS_DEPLOY_ROLE_ARN Actions variable)"
+  value       = aws_iam_role.github_actions.arn
+}

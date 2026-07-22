@@ -1,0 +1,25 @@
+name: Deploy production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Separate group from staging: the two environments have separate state files
+# and need not block each other. cancel-in-progress is false so a queued merge
+# waits for the running apply instead of interrupting it.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+    secrets:
+      calendar_booking_url: ${{ secrets.NEXT_PUBLIC_CALENDAR_BOOKING_URL }}
