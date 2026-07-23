@@ -19,7 +19,11 @@ const posts = defineCollection({
   }),
   transform: async ({ content: _, ...post }, { cache }) => {
     const lastModifiedAt = await cache(post._meta.filePath, async (filePath) => {
-      const { stdout } = await exec(`git log -1 --format=%ai -- ${filePath}`);
+      // _meta.filePath is relative to the collection directory (content/posts),
+      // but git runs from the repo root, so prepend the collection path or git
+      // log matches nothing and every post silently falls back to "now".
+      const repoPath = `content/posts/${filePath}`;
+      const { stdout } = await exec(`git log -1 --format=%ai -- "${repoPath}"`);
       if (stdout) {
         return new Date(stdout.trim()).toISOString();
       }
