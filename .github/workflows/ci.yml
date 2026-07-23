@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+# No AWS access here, so this runs for fork pull requests too and is safe to
+# cancel and restart.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # See deploy.yml - content-collections.ts needs real git history to
+          # compute each post's lastModifiedAt.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # No `pnpm lint` step yet: the repo has eslint and eslint-config-next
+      # installed but no eslint config file, so `next lint` drops into an
+      # interactive setup prompt and exits 1. Add the step once a config exists.
+
+      # src/app/feed.xml/route.ts throws without this, so the build needs a
+      # value even though nothing is deployed from here.
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://staging.mscottford.com
+
+      # cloudfront-redirects.js is committed but also regenerated at deploy
+      # time. If a post's slug or tumblrId changed without regenerating, the
+      # committed file is stale and misleading.
+      - name: Check committed redirects are up to date
+        run: |
+          pnpm generate:redirects
+          if ! git diff --exit-code -- deploy/terraform/cloudfront-redirects.js; then
+            echo "::error::deploy/terraform/cloudfront-redirects.js is stale. Run 'pnpm generate:redirects' and commit the result."
+            exit 1
+          fi

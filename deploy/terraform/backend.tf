@@ -30,5 +30,9 @@ terraform {
     region  = "us-east-1"
     encrypt = true
     # key is provided via -backend-config to allow separate state per environment
+
+    # S3-native state locking. GitHub Actions and local deploys are now two
+    # writers, so an apply from one must block the other rather than race.
+    use_lockfile = true
   }
 }

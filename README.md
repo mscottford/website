@@ -6,6 +6,7 @@ This is the source code for my personal website, [mscottford.com](https://mscott
 
 - [Project TODOs](docs/todo.md) - Remaining work items and project roadmap
 - [Completed Work](docs/completed.md) - Archive of completed tasks
+- [GitHub Actions Deployments](docs/github-actions.md) - CI/CD setup, OIDC auth, and troubleshooting
 
 ## License
 
