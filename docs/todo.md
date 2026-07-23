@@ -96,14 +96,6 @@ Items to consider for a production-ready deployment:
   - Invalidate only changed paths on deploy
   - Reduces invalidation costs at scale
 
-### Linting
-
-- [ ] **Add an ESLint config** - `eslint` and `eslint-config-next` are installed but there is
-  no config file, so `pnpm lint` drops into `next lint`'s interactive setup prompt and exits
-  non-zero. Because of this there is no lint step in `.github/workflows/ci.yml`; add one once
-  a config exists. Note `next lint` itself is deprecated and removed in Next.js 16, so this
-  likely means migrating to the ESLint CLI.
-
 ### Other Considerations
 
 - [ ] **Filter content**: Decide which posts to import (skip image-only posts? link-only posts?)

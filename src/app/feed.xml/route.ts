@@ -1,14 +1,12 @@
-import assert from 'assert'
-import * as cheerio from 'cheerio'
 import { allPosts } from 'content-collections'
 import { Feed } from 'feed'
 
 export const dynamic = 'force-static'
 
-export async function GET(req: Request) {
-  const ReactDOMServer = (await import('react-dom/server')).default;
+export async function GET() {
+  const ReactDOMServer = (await import('react-dom/server')).default
 
-  let siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 
   if (!siteUrl) {
     throw Error('Missing NEXT_PUBLIC_SITE_URL environment variable')
@@ -40,19 +38,23 @@ export async function GET(req: Request) {
     .filter((post) => new Date(post.createdAt) >= feedCutoffDate)
     .sort((a, b) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    });
+    })
 
   for (const post of sortedPosts) {
-    const publicUrl = `${siteUrl}/articles/${post.slug}`;
+    const publicUrl = `${siteUrl}/articles/${post.slug}`
 
     // Use tumblrId as GUID for imported posts to preserve RSS subscriber state
     const itemId = post.tumblrId
       ? `https://mscottford.com/post/${post.tumblrId}`
-      : publicUrl;
+      : publicUrl
 
-    const { default: Content } = await import(`../../../content/posts/${post._meta.filePath}`);
+    const { default: Content } = await import(
+      `../../../content/posts/${post._meta.filePath}`
+    )
 
-    const renderedContent = ReactDOMServer.renderToStaticMarkup(Content(), { identifierPrefix: `post-${post.slug}-` });
+    const renderedContent = ReactDOMServer.renderToStaticMarkup(Content(), {
+      identifierPrefix: `post-${post.slug}-`,
+    })
 
     feed.addItem({
       title: post.title,
@@ -63,7 +65,7 @@ export async function GET(req: Request) {
       date: new Date(post.createdAt),
       author: [author],
       contributor: [author],
-    });
+    })
   }
 
   return new Response(feed.atom1(), {

@@ -33,9 +33,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # No `pnpm lint` step yet: the repo has eslint and eslint-config-next
-      # installed but no eslint config file, so `next lint` drops into an
-      # interactive setup prompt and exits 1. Add the step once a config exists.
+      - run: pnpm lint
+
+      - run: pnpm format:check
 
       # src/app/feed.xml/route.ts throws without this, so the build needs a
       # value even though nothing is deployed from here.

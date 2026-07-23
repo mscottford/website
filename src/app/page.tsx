@@ -22,7 +22,6 @@ import { SocialLink } from '@/components/SocialLink'
 import { iconsByName } from '@/lib/icons'
 import { showHiddenContent } from '@/lib/showHiddenContent'
 import { SnippetContent } from '@/components/SnippetContent'
-import { Snippet } from 'next/dist/compiled/@next/font/dist/google'
 
 function Article({ article }: { article: Post }) {
   return (
@@ -48,13 +47,13 @@ interface Role {
 }
 
 function Role({ role }: { role: Role }) {
-  let startLabel =
+  const startLabel =
     typeof role.start === 'string' ? role.start : role.start.label
-  let startDate =
+  const startDate =
     typeof role.start === 'string' ? role.start : role.start.dateTime
 
-  let endLabel = typeof role.end === 'string' ? role.end : role.end.label
-  let endDate = typeof role.end === 'string' ? role.end : role.end.dateTime
+  const endLabel = typeof role.end === 'string' ? role.end : role.end.label
+  const endDate = typeof role.end === 'string' ? role.end : role.end.dateTime
 
   return (
     <li className="flex gap-4">
@@ -85,7 +84,7 @@ function Role({ role }: { role: Role }) {
 }
 
 function Resume() {
-  let resume: Array<Role> = [
+  const resume: Array<Role> = [
     {
       company: 'Planetaria',
       title: 'CEO',
@@ -139,7 +138,13 @@ function Resume() {
 }
 
 function Photos() {
-  let rotations = ['rotate-2', '-rotate-2', 'rotate-2', 'rotate-2', '-rotate-2']
+  const rotations = [
+    'rotate-2',
+    '-rotate-2',
+    'rotate-2',
+    'rotate-2',
+    '-rotate-2',
+  ]
 
   return (
     <div className="mt-16 sm:mt-20">
@@ -179,12 +184,15 @@ function SocialLinks() {
         />
       ))}
     </div>
-  );
+  )
 }
 
 export default async function Home() {
-  let articles = [...allPosts]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const articles = [...allPosts]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
     .slice(0, 4)
 
   return (
@@ -233,7 +241,7 @@ export default async function Home() {
             </Link>
           </div>
           {showHiddenContent() && (
-            <div className="space-y-10 lg:pl-8 xl:pl-24 outline-1 outline-dashed outline-purple-500 rounded">
+            <div className="space-y-10 rounded outline-1 outline-purple-500 outline-dashed lg:pl-8 xl:pl-24">
               <Resume />
             </div>
           )}

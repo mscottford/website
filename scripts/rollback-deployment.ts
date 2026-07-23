@@ -39,13 +39,19 @@ interface VersionsResponse {
   }>
 }
 
-function parseArgs(): { bucket: string; versionsBack: number; dryRun: boolean } {
+function parseArgs(): {
+  bucket: string
+  versionsBack: number
+  dryRun: boolean
+} {
   const args = process.argv.slice(2)
 
   // First arg should be the bucket name
   const bucket = args[0]
   if (!bucket || bucket.startsWith('--')) {
-    console.error('Usage: ts-node rollback-deployment.ts <bucket-name> [--versions-back N] [--dry-run]')
+    console.error(
+      'Usage: ts-node rollback-deployment.ts <bucket-name> [--versions-back N] [--dry-run]',
+    )
     console.error('')
     console.error('Use the npm scripts instead:')
     console.error('  pnpm rollback:staging [--versions-back N] [--dry-run]')
@@ -81,8 +87,12 @@ function listObjectVersions(bucket: string): ObjectVersion[] {
       ? `aws s3api list-object-versions --bucket ${bucket} --key-marker "${continuationToken}"`
       : `aws s3api list-object-versions --bucket ${bucket}`
 
-    const output = execSync(cmd, { encoding: 'utf-8', maxBuffer: 50 * 1024 * 1024 })
-    const data: VersionsResponse & { NextKeyMarker?: string } = JSON.parse(output)
+    const output = execSync(cmd, {
+      encoding: 'utf-8',
+      maxBuffer: 50 * 1024 * 1024,
+    })
+    const data: VersionsResponse & { NextKeyMarker?: string } =
+      JSON.parse(output)
 
     if (data.Versions) {
       for (const v of data.Versions) {
@@ -101,7 +111,9 @@ function listObjectVersions(bucket: string): ObjectVersion[] {
   return versions
 }
 
-function groupVersionsByKey(versions: ObjectVersion[]): Map<string, ObjectVersion[]> {
+function groupVersionsByKey(
+  versions: ObjectVersion[],
+): Map<string, ObjectVersion[]> {
   const grouped = new Map<string, ObjectVersion[]>()
 
   for (const v of versions) {
@@ -112,7 +124,10 @@ function groupVersionsByKey(versions: ObjectVersion[]): Map<string, ObjectVersio
 
   // Sort each group by lastModified descending (newest first)
   for (const [key, versionList] of grouped) {
-    versionList.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())
+    versionList.sort(
+      (a, b) =>
+        new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime(),
+    )
     grouped.set(key, versionList)
   }
 
@@ -148,7 +163,9 @@ function rollback(bucket: string, versionsBack: number, dryRun: boolean): void {
       // Not enough versions to roll back this far
       skippedCount++
       if (dryRun) {
-        console.log(`⏭️  Skip: ${key} (only ${versionList.length} version(s) available)`)
+        console.log(
+          `⏭️  Skip: ${key} (only ${versionList.length} version(s) available)`,
+        )
       }
       continue
     }
@@ -163,19 +180,25 @@ function rollback(bucket: string, versionsBack: number, dryRun: boolean): void {
 
     if (dryRun) {
       console.log(`📄 Would restore: ${key}`)
-      console.log(`   From: ${currentVersion.versionId.substring(0, 16)}... (${currentVersion.lastModified})`)
-      console.log(`   To:   ${targetVersion.versionId.substring(0, 16)}... (${targetVersion.lastModified})`)
+      console.log(
+        `   From: ${currentVersion.versionId.substring(0, 16)}... (${currentVersion.lastModified})`,
+      )
+      console.log(
+        `   To:   ${targetVersion.versionId.substring(0, 16)}... (${targetVersion.lastModified})`,
+      )
     } else {
       try {
         // Copy the old version to make it the new current version
-        const copySource = encodeURIComponent(`${bucket}/${key}?versionId=${targetVersion.versionId}`)
+        const copySource = encodeURIComponent(
+          `${bucket}/${key}?versionId=${targetVersion.versionId}`,
+        )
         execSync(
           `aws s3api copy-object --bucket ${bucket} --key "${key}" --copy-source "${copySource}"`,
-          { encoding: 'utf-8', stdio: 'pipe' }
+          { encoding: 'utf-8', stdio: 'pipe' },
         )
         console.log(`✅ Restored: ${key}`)
         restoredCount++
-      } catch (error) {
+      } catch {
         console.error(`❌ Failed: ${key}`)
         errorCount++
       }
@@ -196,7 +219,9 @@ function rollback(bucket: string, versionsBack: number, dryRun: boolean): void {
 
   if (!dryRun && restoredCount > 0) {
     console.log('\n⚠️  Remember to invalidate the CloudFront cache:')
-    console.log(`   aws cloudfront create-invalidation --distribution-id <ID> --paths "/*"`)
+    console.log(
+      `   aws cloudfront create-invalidation --distribution-id <ID> --paths "/*"`,
+    )
   }
 
   console.log('')

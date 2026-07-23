@@ -6,6 +6,31 @@ This document archives completed tasks from the project TODO list.
 
 The site has been successfully launched at https://mscottford.com.
 
+## Linting & Formatting (2026-07-22)
+
+Replaced the deprecated `next lint` with the oxc toolchain — oxlint for linting
+and oxfmt for formatting — dropping ESLint and Prettier entirely (`next lint` is
+removed in Next.js 16). `pnpm lint` runs `oxlint`, `pnpm format` runs `oxfmt`,
+and CI runs `pnpm lint` + `pnpm format:check` as required checks.
+
+- [x] Add `.oxlintrc.jsonc` with the `typescript`, `react`, `react-perf`,
+  `nextjs`, `jsx-a11y`, `import`, `unicorn`, and `oxc` plugins (native Rust
+  equivalents of what `eslint-config-next` provided)
+- [x] Add `.oxfmtrc.json` via `oxfmt --migrate=prettier`, preserving the
+  single-quote / no-semicolon style and Tailwind class sorting (migrated from
+  `prettier-plugin-tailwindcss` to oxfmt's native `sortTailwindcss`)
+- [x] Scope oxfmt to code — ignore markdown prose and the generated
+  `deploy/terraform/cloudfront-redirects.js` (CI checks it for staleness)
+- [x] Fix all lint findings (auto-fixed `prefer-const`; removed dead
+  imports/`require()` calls and unused catch bindings in the helper scripts)
+- [x] Suppress `jsx-a11y/no-redundant-roles` at the three intentional
+  `role="list"` sites (Safari drops list semantics on list-style reset), via
+  targeted inline `oxlint-disable-next-line` comments
+- [x] Switch the `lint` script to `oxlint`; add `format` / `format:check`
+- [x] Format the codebase with oxfmt and add both checks to CI
+- [x] Remove `eslint`, `eslint-config-next`, `@eslint/eslintrc`, `prettier`,
+  and `prettier-plugin-tailwindcss`
+
 ## Calendar Page (2026-01-20)
 
 Added a `/calendar` page that embeds the Google Calendar booking page via iframe. The booking URL is stored in the `NEXT_PUBLIC_CALENDAR_BOOKING_URL` environment variable (see `.env` file).
