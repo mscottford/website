@@ -1,9 +1,9 @@
 import { defineCollection, defineConfig } from '@content-collections/core'
 import util from 'node:util'
-import child_process from 'node:child_process';
+import child_process from 'node:child_process'
 import { z } from 'zod'
 
-const exec = util.promisify(child_process.exec);
+const exec = util.promisify(child_process.exec)
 
 const posts = defineCollection({
   name: 'posts',
@@ -18,22 +18,27 @@ const posts = defineCollection({
     tumblrSlug: z.string().optional(),
   }),
   transform: async ({ content: _, ...post }, { cache }) => {
-    const lastModifiedAt = await cache(post._meta.filePath, async (filePath) => {
-      // _meta.filePath is relative to the collection directory (content/posts),
-      // but git runs from the repo root, so prepend the collection path or git
-      // log matches nothing and every post silently falls back to "now".
-      const repoPath = `content/posts/${filePath}`;
-      const { stdout } = await exec(`git log -1 --format=%ai -- "${repoPath}"`);
-      if (stdout) {
-        return new Date(stdout.trim()).toISOString();
-      }
-      return new Date().toISOString();
-    });
+    const lastModifiedAt = await cache(
+      post._meta.filePath,
+      async (filePath) => {
+        // _meta.filePath is relative to the collection directory (content/posts),
+        // but git runs from the repo root, so prepend the collection path or git
+        // log matches nothing and every post silently falls back to "now".
+        const repoPath = `content/posts/${filePath}`
+        const { stdout } = await exec(
+          `git log -1 --format=%ai -- "${repoPath}"`,
+        )
+        if (stdout) {
+          return new Date(stdout.trim()).toISOString()
+        }
+        return new Date().toISOString()
+      },
+    )
 
-    const createdAt = new Date(post.dateTime).toISOString();
+    const createdAt = new Date(post.dateTime).toISOString()
 
     // Use filename (without extension) as slug instead of deriving from title
-    const slug = post._meta.fileName.replace(/\.mdx$/, '');
+    const slug = post._meta.fileName.replace(/\.mdx$/, '')
 
     return {
       ...post,
@@ -41,8 +46,8 @@ const posts = defineCollection({
       createdAt,
       lastModifiedAt,
     }
-  }
-});
+  },
+})
 
 const socialLinks = defineCollection({
   name: 'socialLinks',
@@ -57,10 +62,10 @@ const socialLinks = defineCollection({
   transform: async ({ ...link }) => {
     return {
       ...link,
-      slug: link.platform.toLowerCase().replace(/ /g, "-"),
+      slug: link.platform.toLowerCase().replace(/ /g, '-'),
     }
-  }
-});
+  },
+})
 
 const navItems = defineCollection({
   name: 'navItems',
@@ -72,7 +77,7 @@ const navItems = defineCollection({
     href: z.string(),
     hidden: z.boolean().optional(),
   }),
-});
+})
 
 const snippets = defineCollection({
   name: 'snippets',
@@ -91,8 +96,8 @@ const snippets = defineCollection({
       plainContent,
     }
   },
-});
+})
 
 export default defineConfig({
   collections: [posts, socialLinks, navItems, snippets],
-});
+})

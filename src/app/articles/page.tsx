@@ -4,7 +4,7 @@ import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
 import { formatDate } from '@/lib/formatDate'
 
-import { allPosts, Post } from "content-collections";
+import { allPosts, Post } from 'content-collections'
 import { getSnippetPlain } from '@/lib/snippets'
 
 function Article({ article }: { article: Post }) {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 
 export default async function ArticlesIndex() {
   const sortedPosts = [...allPosts].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )
 
   return (

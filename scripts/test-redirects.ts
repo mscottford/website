@@ -30,7 +30,7 @@ interface TestResult {
 
 async function testRedirect(
   baseUrl: string,
-  rule: S3RoutingRule
+  rule: S3RoutingRule,
 ): Promise<TestResult> {
   const source = `/${rule.Condition.KeyPrefixEquals}`
   const expectedTarget = `/${rule.Redirect.ReplaceKeyWith}`
@@ -93,10 +93,14 @@ async function main() {
   const baseUrl = process.argv[2]
 
   if (!baseUrl) {
-    console.error('Usage: pnpm exec ts-node --esm scripts/test-redirects.ts <base-url>')
+    console.error(
+      'Usage: pnpm exec ts-node --esm scripts/test-redirects.ts <base-url>',
+    )
     console.error('')
     console.error('Example:')
-    console.error('  pnpm exec ts-node --esm scripts/test-redirects.ts https://staging.mscottford.com')
+    console.error(
+      '  pnpm exec ts-node --esm scripts/test-redirects.ts https://staging.mscottford.com',
+    )
     process.exit(1)
   }
 
@@ -106,7 +110,7 @@ async function main() {
   // Read routing rules
   const rulesPath = path.join(
     import.meta.dirname,
-    '../deploy/terraform/s3-routing-rules.json'
+    '../deploy/terraform/s3-routing-rules.json',
   )
 
   if (!fs.existsSync(rulesPath)) {

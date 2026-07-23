@@ -42,7 +42,11 @@ export function MobileNavigation(
         <nav className="mt-6">
           <ul className="-my-2 divide-y divide-zinc-100 text-base text-zinc-800 dark:divide-zinc-100/5 dark:text-zinc-300">
             {visibleNavItems.map((item) => (
-              <MobileNavItem key={item.href} href={item.href} outlined={item.hidden}>
+              <MobileNavItem
+                key={item.href}
+                href={item.href}
+                outlined={item.hidden}
+              >
                 {item.label}
               </MobileNavItem>
             ))}

@@ -1,20 +1,20 @@
-import { allPosts } from "content-collections";
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { allPosts } from 'content-collections'
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { ArticleJsonLd } from '@/components/ArticleJsonLd'
 import { Prose } from '@/components/Prose'
-import { formatDate } from "@/lib/formatDate";
+import { formatDate } from '@/lib/formatDate'
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const article = allPosts.find((post) => post.slug === slug);
+  const { slug } = await params
+  const article = allPosts.find((post) => post.slug === slug)
 
   if (!article) {
-    return {};
+    return {}
   }
 
   return {
@@ -26,19 +26,23 @@ export async function generateMetadata({
       modifiedTime: article.lastModifiedAt,
       authors: ['M. Scott Ford'],
     },
-  };
+  }
 }
 
-export default async function Article({ params }: {
+export default async function Article({
+  params,
+}: {
   params: Promise<{ slug: string }>
 }) {
-  const { slug } = await params;
-  const article = allPosts.find((post) => post.slug === slug);
+  const { slug } = await params
+  const article = allPosts.find((post) => post.slug === slug)
   if (!article) {
-    return notFound();
+    return notFound()
   }
 
-  const { default: Content } = await import(`../../../../content/posts/${article._meta.filePath}`);
+  const { default: Content } = await import(
+    `../../../../content/posts/${article._meta.filePath}`
+  )
 
   return (
     <>
@@ -67,11 +71,11 @@ export default async function Article({ params }: {
         </Prose>
       </article>
     </>
-  );
+  )
 }
 
 export function generateStaticParams() {
-  return allPosts.map((post) => ({ slug: post.slug }));
+  return allPosts.map((post) => ({ slug: post.slug }))
 }
 
 export const dynamicParams = false

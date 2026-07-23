@@ -10,7 +10,10 @@ export function SnippetContent({ name }: SnippetContentProps) {
 
   // Parse markdown links and split into parts
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-  const parts: Array<{ type: 'text'; value: string } | { type: 'link'; text: string; href: string }> = []
+  const parts: Array<
+    | { type: 'text'; value: string }
+    | { type: 'link'; text: string; href: string }
+  > = []
 
   let lastIndex = 0
   let match
