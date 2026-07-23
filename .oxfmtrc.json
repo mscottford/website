@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "semi": false,
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "sortTailwindcss": {
+    "stylesheet": "./src/styles/tailwind.css"
+  },
+  "ignorePatterns": [
+    "*.md",
+    "*.mdx",
+    "deploy/terraform/cloudfront-redirects.js"
+  ]
+}

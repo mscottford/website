@@ -13,7 +13,7 @@ export function NavItem({
   children: React.ReactNode
   outlined?: boolean
 }) {
-  let isActive = usePathname() === href
+  const isActive = usePathname() === href
 
   return (
     <li>

@@ -18,7 +18,7 @@ export default function ArticleLayout({
 }: {
   children: React.ReactNode
 }) {
-  const previousPathname = false;
+  const previousPathname = false
   return (
     <Container className="mt-16 lg:mt-32">
       <div className="xl:relative">

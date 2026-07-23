@@ -11,7 +11,8 @@ Personal website and blog for M. Scott Ford (mscottford.com) built with Next.js 
 ```bash
 pnpm dev          # Start development server (includes favicon pre-build)
 pnpm build        # Production build with static export to /out
-pnpm lint         # Run Next.js ESLint
+pnpm lint         # Lint with oxlint
+pnpm format       # Format with oxfmt (use format:check in CI)
 pnpm build:favicons  # Generate favicons from source image
 ```
 
@@ -43,7 +44,7 @@ Posts are imported as `allPosts` from `content-collections` and rendered via dyn
 
 - **TypeScript paths**: `@/*` → `./src/*`, `content-collections` → `./.content-collections/generated`
 - **Styling**: Tailwind CSS v4 with PostCSS API; dark mode via next-themes
-- **Code style**: Single quotes, no semicolons (Prettier with Tailwind plugin)
+- **Code style**: Single quotes, no semicolons (oxfmt, with Tailwind class sorting via `sortTailwindcss`)
 
 ## Environment Variables
 

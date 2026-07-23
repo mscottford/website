@@ -1,7 +1,6 @@
 import { visit } from 'unist-util-visit'
 import type { Root } from 'mdast'
 import type { VFile } from 'vfile'
-import path from 'path'
 
 /**
  * Remark plugin that transforms relative image paths in MDX files

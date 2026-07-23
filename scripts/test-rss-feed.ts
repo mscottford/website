@@ -32,13 +32,19 @@ interface FeedData {
 interface ComparisonResult {
   newItems: FeedItem[]
   removedItems: FeedItem[]
-  modifiedItems: Array<{ baseline: FeedItem; updated: FeedItem; changes: string[] }>
+  modifiedItems: Array<{
+    baseline: FeedItem
+    updated: FeedItem
+    changes: string[]
+  }>
 }
 
 async function fetchFeed(url: string): Promise<string> {
   const response = await fetch(url)
   if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`)
+    throw new Error(
+      `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+    )
   }
   return response.text()
 }
@@ -46,7 +52,8 @@ async function fetchFeed(url: string): Promise<string> {
 function parseFeed(xml: string): FeedData {
   const $ = cheerio.load(xml, { xmlMode: true })
 
-  const title = $('channel > title').text() || $('feed > title').text() || 'Unknown Feed'
+  const title =
+    $('channel > title').text() || $('feed > title').text() || 'Unknown Feed'
 
   const items: FeedItem[] = []
 
@@ -74,7 +81,8 @@ function parseFeed(xml: string): FeedData {
       const id = $entry.find('id').text()
       const link = $entry.find('link').attr('href') || ''
       const entryTitle = $entry.find('title').text()
-      const published = $entry.find('published').text() || $entry.find('updated').text()
+      const published =
+        $entry.find('published').text() || $entry.find('updated').text()
 
       items.push({
         guid: id || link,
@@ -89,18 +97,23 @@ function parseFeed(xml: string): FeedData {
   return { title, items }
 }
 
-function compareFeedItems(baseline: FeedData, updated: FeedData): ComparisonResult {
+function compareFeedItems(
+  baseline: FeedData,
+  updated: FeedData,
+): ComparisonResult {
   const baselineGuids = new Set(baseline.items.map((item) => item.guid))
   const baselineLinks = new Set(baseline.items.map((item) => item.link))
   const updatedGuids = new Set(updated.items.map((item) => item.guid))
 
   // Items in updated feed that aren't in baseline (by GUID)
   const newItems = updated.items.filter(
-    (item) => !baselineGuids.has(item.guid) && !baselineLinks.has(item.link)
+    (item) => !baselineGuids.has(item.guid) && !baselineLinks.has(item.link),
   )
 
   // Items in baseline that aren't in updated (removed)
-  const removedItems = baseline.items.filter((item) => !updatedGuids.has(item.guid))
+  const removedItems = baseline.items.filter(
+    (item) => !updatedGuids.has(item.guid),
+  )
 
   // Items that exist in both but may have changed
   const modifiedItems: ComparisonResult['modifiedItems'] = []
@@ -115,10 +128,16 @@ function compareFeedItems(baseline: FeedData, updated: FeedData): ComparisonResu
         changes.push(`link: "${baselineItem.link}" → "${updatedItem.link}"`)
       }
       if (baselineItem.pubDate !== updatedItem.pubDate) {
-        changes.push(`pubDate: "${baselineItem.pubDate}" → "${updatedItem.pubDate}"`)
+        changes.push(
+          `pubDate: "${baselineItem.pubDate}" → "${updatedItem.pubDate}"`,
+        )
       }
       if (changes.length > 0) {
-        modifiedItems.push({ baseline: baselineItem, updated: updatedItem, changes })
+        modifiedItems.push({
+          baseline: baselineItem,
+          updated: updatedItem,
+          changes,
+        })
       }
     }
   }
@@ -142,15 +161,21 @@ async function main() {
   const args = process.argv.slice(2)
 
   if (args.length < 2) {
-    console.error('Usage: ts-node --esm scripts/test-rss-feed.ts <baseline-url> <new-url> [--cutoff-days=N]')
+    console.error(
+      'Usage: ts-node --esm scripts/test-rss-feed.ts <baseline-url> <new-url> [--cutoff-days=N]',
+    )
     console.error('')
     console.error('Arguments:')
     console.error('  baseline-url   URL of the current/production RSS feed')
     console.error('  new-url        URL of the new/staging RSS feed')
-    console.error('  --cutoff-days  Days threshold for "old" posts (default: 7)')
+    console.error(
+      '  --cutoff-days  Days threshold for "old" posts (default: 7)',
+    )
     console.error('')
     console.error('Example:')
-    console.error('  ts-node --esm scripts/test-rss-feed.ts https://mscottford.com/feed.xml https://staging.mscottford.com/feed.xml')
+    console.error(
+      '  ts-node --esm scripts/test-rss-feed.ts https://mscottford.com/feed.xml https://staging.mscottford.com/feed.xml',
+    )
     process.exit(2)
   }
 
@@ -168,7 +193,9 @@ async function main() {
   console.log('=======================')
   console.log(`Baseline: ${baselineUrl}`)
   console.log(`New:      ${newUrl}`)
-  console.log(`Cutoff:   ${cutoffDays} days (posts older than this are considered "old")`)
+  console.log(
+    `Cutoff:   ${cutoffDays} days (posts older than this are considered "old")`,
+  )
   console.log('')
 
   let baselineFeed: FeedData
@@ -178,7 +205,9 @@ async function main() {
     console.log('Fetching baseline feed...')
     const baselineXml = await fetchFeed(baselineUrl)
     baselineFeed = parseFeed(baselineXml)
-    console.log(`  Found ${baselineFeed.items.length} items in "${baselineFeed.title}"`)
+    console.log(
+      `  Found ${baselineFeed.items.length} items in "${baselineFeed.title}"`,
+    )
   } catch (error) {
     console.error(`Error fetching baseline feed: ${error}`)
     process.exit(2)
@@ -203,12 +232,18 @@ async function main() {
   let hasFailures = false
 
   // Categorize new items as genuinely new or problematic old posts
-  const genuinelyNewItems = comparison.newItems.filter((item) => !isOldPost(item, cutoffDays))
-  const oldPostsAppearingNew = comparison.newItems.filter((item) => isOldPost(item, cutoffDays))
+  const genuinelyNewItems = comparison.newItems.filter(
+    (item) => !isOldPost(item, cutoffDays),
+  )
+  const oldPostsAppearingNew = comparison.newItems.filter((item) =>
+    isOldPost(item, cutoffDays),
+  )
 
   // Report genuinely new items (expected behavior)
   if (genuinelyNewItems.length > 0) {
-    console.log(`✓ ${genuinelyNewItems.length} genuinely new item(s) detected (expected):`)
+    console.log(
+      `✓ ${genuinelyNewItems.length} genuinely new item(s) detected (expected):`,
+    )
     for (const item of genuinelyNewItems) {
       console.log(`    - "${item.title}" (${formatDate(item.pubDateParsed)})`)
     }
@@ -218,21 +253,27 @@ async function main() {
   // Report old posts appearing as new (FAILURE)
   if (oldPostsAppearingNew.length > 0) {
     hasFailures = true
-    console.log(`✗ ${oldPostsAppearingNew.length} old post(s) would appear as NEW to subscribers:`)
+    console.log(
+      `✗ ${oldPostsAppearingNew.length} old post(s) would appear as NEW to subscribers:`,
+    )
     for (const item of oldPostsAppearingNew) {
       console.log(`    - "${item.title}" (${formatDate(item.pubDateParsed)})`)
       console.log(`      GUID: ${item.guid}`)
       console.log(`      Link: ${item.link}`)
     }
     console.log('')
-    console.log('  This will cause existing subscribers to see old posts as new!')
+    console.log(
+      '  This will cause existing subscribers to see old posts as new!',
+    )
     console.log('  Check if GUIDs or links have changed between feeds.')
     console.log('')
   }
 
   // Report removed items (informational)
   if (comparison.removedItems.length > 0) {
-    console.log(`ℹ ${comparison.removedItems.length} item(s) removed from feed:`)
+    console.log(
+      `ℹ ${comparison.removedItems.length} item(s) removed from feed:`,
+    )
     for (const item of comparison.removedItems) {
       console.log(`    - "${item.title}" (${formatDate(item.pubDateParsed)})`)
     }

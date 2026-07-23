@@ -12,8 +12,7 @@ export const metadata: Metadata = {
   ),
   title: {
     template: '%s - M. Scott Ford',
-    default:
-      `M. Scott Ford - ${getSnippetPlain('tagline')}`,
+    default: `M. Scott Ford - ${getSnippetPlain('tagline')}`,
   },
   description: getSnippetPlain('teaser'),
   alternates: {

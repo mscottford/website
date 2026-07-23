@@ -32,7 +32,7 @@ for (const post of allPosts) {
 // Add static redirects
 rules.push(
   { prefix: 'rss', target: 'feed.xml' },
-  { prefix: 'archive', target: 'articles/' }
+  { prefix: 'archive', target: 'articles/' },
 )
 
 // Generate CloudFront Function code
@@ -81,7 +81,7 @@ function handler(event) {
 // Write CloudFront Function code
 const cfFunctionPath = path.join(
   import.meta.dirname,
-  '../deploy/terraform/cloudfront-redirects.js'
+  '../deploy/terraform/cloudfront-redirects.js',
 )
 fs.writeFileSync(cfFunctionPath, cloudFrontFunctionCode)
 
@@ -104,7 +104,7 @@ const s3Rules: S3RoutingRule[] = rules.map((r) => ({
 
 const s3RulesPath = path.join(
   import.meta.dirname,
-  '../deploy/terraform/s3-routing-rules.json'
+  '../deploy/terraform/s3-routing-rules.json',
 )
 fs.writeFileSync(s3RulesPath, JSON.stringify(s3Rules, null, 2))
 

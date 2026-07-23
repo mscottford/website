@@ -17,8 +17,7 @@
  */
 
 import { execSync } from 'node:child_process'
-import { createGunzip } from 'node:zlib'
-import { Readable } from 'node:stream'
+import { gunzipSync } from 'node:zlib'
 
 interface LogEntry {
   timestamp: Date
@@ -37,7 +36,9 @@ function parseArgs(): { bucket: string; follow: boolean; lines: number } {
 
   const bucket = args[0]
   if (!bucket || bucket.startsWith('-')) {
-    console.error('Usage: ts-node tail-access-logs.ts <bucket-name> [--follow] [--lines N]')
+    console.error(
+      'Usage: ts-node tail-access-logs.ts <bucket-name> [--follow] [--lines N]',
+    )
     console.error('')
     console.error('Use the npm scripts instead:')
     console.error('  pnpm logs:staging [--follow] [--lines N]')
@@ -68,7 +69,7 @@ function listLogFiles(bucket: string, prefix: string): string[] {
   try {
     const output = execSync(
       `aws s3api list-objects-v2 --bucket ${bucket} --prefix "${prefix}" --query "Contents[].Key" --output json`,
-      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }
+      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] },
     )
     const keys = JSON.parse(output) as string[] | null
     return keys || []
@@ -87,10 +88,9 @@ function downloadAndDecompressLog(bucket: string, key: string): string {
     })
 
     // Decompress synchronously using zlib
-    const zlib = require('node:zlib')
-    const decompressed = zlib.gunzipSync(gzippedData)
+    const decompressed = gunzipSync(gzippedData)
     return decompressed.toString('utf-8')
-  } catch (error) {
+  } catch {
     return ''
   }
 }
@@ -129,17 +129,27 @@ function parseLogLine(line: string): LogEntry | null {
 
 function formatLogEntry(entry: LogEntry): string {
   const time = entry.timestamp.toISOString().replace('T', ' ').replace('Z', '')
-  const status = entry.status >= 400 ? `\x1b[31m${entry.status}\x1b[0m` :
-                 entry.status >= 300 ? `\x1b[33m${entry.status}\x1b[0m` :
-                 `\x1b[32m${entry.status}\x1b[0m`
-  const timeTaken = entry.timeTaken < 0.1 ? `\x1b[32m${entry.timeTaken.toFixed(3)}s\x1b[0m` :
-                    entry.timeTaken < 0.5 ? `\x1b[33m${entry.timeTaken.toFixed(3)}s\x1b[0m` :
-                    `\x1b[31m${entry.timeTaken.toFixed(3)}s\x1b[0m`
+  const status =
+    entry.status >= 400
+      ? `\x1b[31m${entry.status}\x1b[0m`
+      : entry.status >= 300
+        ? `\x1b[33m${entry.status}\x1b[0m`
+        : `\x1b[32m${entry.status}\x1b[0m`
+  const timeTaken =
+    entry.timeTaken < 0.1
+      ? `\x1b[32m${entry.timeTaken.toFixed(3)}s\x1b[0m`
+      : entry.timeTaken < 0.5
+        ? `\x1b[33m${entry.timeTaken.toFixed(3)}s\x1b[0m`
+        : `\x1b[31m${entry.timeTaken.toFixed(3)}s\x1b[0m`
 
   return `${time} ${status} ${entry.method.padEnd(4)} ${entry.uri.substring(0, 60).padEnd(60)} ${timeTaken} ${entry.clientIp}`
 }
 
-function getRecentLogs(bucket: string, prefix: string, maxEntries: number): LogEntry[] {
+function getRecentLogs(
+  bucket: string,
+  prefix: string,
+  maxEntries: number,
+): LogEntry[] {
   // List all log files
   const logFiles = listLogFiles(bucket, prefix)
 
@@ -175,10 +185,15 @@ function getRecentLogs(bucket: string, prefix: string, maxEntries: number): LogE
 }
 
 async function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function tailLogs(bucket: string, prefix: string, lines: number, follow: boolean): Promise<void> {
+async function tailLogs(
+  bucket: string,
+  prefix: string,
+  lines: number,
+  follow: boolean,
+): Promise<void> {
   console.log(`\n📋 Tailing CloudFront logs from s3://${bucket}/${prefix}`)
   if (follow) {
     console.log('   (Press Ctrl+C to stop)\n')
@@ -193,14 +208,18 @@ async function tailLogs(bucket: string, prefix: string, lines: number, follow: b
   const initialEntries = getRecentLogs(bucket, prefix, lines)
 
   if (initialEntries.length === 0) {
-    console.log('No log entries found yet. CloudFront logs are typically delivered every few minutes.')
+    console.log(
+      'No log entries found yet. CloudFront logs are typically delivered every few minutes.',
+    )
     if (!follow) {
       return
     }
   } else {
     for (const entry of initialEntries) {
       console.log(formatLogEntry(entry))
-      seenEntries.add(`${entry.timestamp.getTime()}-${entry.uri}-${entry.clientIp}`)
+      seenEntries.add(
+        `${entry.timestamp.getTime()}-${entry.uri}-${entry.clientIp}`,
+      )
       lastTimestamp = entry.timestamp
     }
   }
