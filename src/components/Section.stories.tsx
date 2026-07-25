@@ -48,7 +48,9 @@ export const WithMultipleItems: Story = {
           <h3 className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
             Junior Developer at Company B
           </h3>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">2018 - 2020</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            2018 - 2020
+          </p>
         </div>
       </div>
     ),

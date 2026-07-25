@@ -1,9 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Button } from './Button'
 
-const meta: Meta<typeof Button> = {
+// Button accepts a union of button props and Link props. Inferring args from
+// that union collapses them to `never`, so spell out the controllable subset
+// instead and cast once here.
+type ButtonStoryProps = {
+  variant?: 'primary' | 'secondary'
+  children?: React.ReactNode
+  href?: string
+  disabled?: boolean
+  className?: string
+}
+
+const meta: Meta<ButtonStoryProps> = {
   title: 'Components/Button',
-  component: Button,
+  component: Button as React.ComponentType<ButtonStoryProps>,
   parameters: {
     layout: 'centered',
   },
@@ -26,7 +37,7 @@ const meta: Meta<typeof Button> = {
 }
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<ButtonStoryProps>
 
 export const Primary: Story = {
   args: {

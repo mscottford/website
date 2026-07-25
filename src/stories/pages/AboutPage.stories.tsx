@@ -79,6 +79,9 @@ function AboutPage() {
           </div>
         </div>
         <div className="lg:pl-20">
+          {/* role="list" restores list semantics that Safari drops when list-style
+              is reset — https://www.scottohara.me/blog/2019/01/12/lists-and-safari.html */}
+          {/* oxlint-disable-next-line jsx-a11y/no-redundant-roles */}
           <ul role="list">
             <SocialLink href="#" icon={XIcon}>
               Follow on X
