@@ -1,7 +1,12 @@
 import Link from 'next/link'
 import clsx from 'clsx'
 import Image from 'next/image'
-import avatarImage from '@/images/avatar.jpg'
+// A copy sized for the 36px it renders at, rather than `avatar.jpg`, which is
+// the 1379px master kept for generating the favicons. Static export runs with
+// `images: { unoptimized: true }`, so next/image ships whatever it is given at
+// full size — the master meant 1.25MB fetched on every page of the site to
+// draw this circle.
+import avatarImage from '@/images/avatar-header.jpg'
 
 export function Avatar({
   label = undefined,
