@@ -35,13 +35,25 @@ export function Card<T extends React.ElementType = 'div'>({
 
 Card.Link = function CardLink({
   children,
+  className,
   ...props
 }: React.ComponentPropsWithoutRef<typeof Link>) {
   return (
     <>
       <div className="absolute -inset-x-4 -inset-y-6 z-0 scale-95 bg-zinc-50 opacity-0 transition group-hover:scale-100 group-hover:opacity-100 sm:-inset-x-6 sm:rounded-2xl dark:bg-zinc-800/50" />
-      <Link {...props}>
-        <span className="absolute -inset-x-4 -inset-y-6 z-20 sm:-inset-x-6 sm:rounded-2xl" />
+      {/* The card is clickable across its whole area, which used to be an empty
+          absolutely-positioned span stretched over it. As a real element it sat
+          in front of the card's own text, and anything measuring contrast could
+          no longer tell what was behind that text — it is what put every card
+          on the site into the accessibility checks' needs-review pile. An
+          ::after does the same job without being in the document. */}
+      <Link
+        {...props}
+        className={clsx(
+          className,
+          "after:absolute after:-inset-x-4 after:-inset-y-6 after:z-20 after:content-[''] sm:after:-inset-x-6 sm:after:rounded-2xl",
+        )}
+      >
         <span className="relative z-10">{children}</span>
       </Link>
     </>

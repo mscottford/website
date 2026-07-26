@@ -19,7 +19,7 @@ function NavLink({
     <Link
       href={href}
       className={clsx(
-        'transition hover:text-teal-500 dark:hover:text-teal-400',
+        'transition hover:text-teal-700 dark:hover:text-teal-400',
         outlined && 'outline-1 outline-dashed outline-purple-500 rounded',
       )}
     >
