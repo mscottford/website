@@ -67,8 +67,23 @@ const samplePosts: Post[] = [
   }),
 ]
 
-/** Renders the resume column, which the site only shows in development. */
-const withResume = { parameters: { showHiddenContent: true } }
+/**
+ * Reveals everything the site keeps behind `showHiddenContent()`.
+ *
+ * That flag is not scoped to the resume column. Turning it on also un-hides
+ * the nav items marked hidden — About, Projects, Speaking and Uses — in both
+ * the header and the footer, so this shows nine dashed purple outlines rather
+ * than one. The outline is the site's marker for content that isn't live yet.
+ *
+ * Not captured by Chromatic. What's behind the flag is unfinished: the resume
+ * is still the template's placeholder, and the outlines are a development
+ * affordance nobody visiting the site sees. Baselining it would spend
+ * snapshots on a view that never ships and churn them whenever an unfinished
+ * page changes. Remove `chromatic.disable` to start capturing it.
+ */
+const withHiddenContent = {
+  parameters: { showHiddenContent: true, chromatic: { disable: true } },
+}
 
 /** Renders with nothing published yet. */
 const withNoPosts = { parameters: { posts: [] as Post[] } }
@@ -132,28 +147,35 @@ export const ThemeToggle: Story = {
 }
 
 /**
- * The resume panel is only rendered in development, where it sits in a second
- * column beside the articles. That second column is a `lg:` layout, so the
- * mobile and tablet stories are where you see it stack instead.
+ * The site as it looks locally, with the unfinished content showing: the
+ * resume column in a second `lg:` column beside the articles, and the hidden
+ * nav items back in the header and footer. See `withHiddenContent` above for
+ * why these aren't captured by Chromatic.
  */
-export const WithResume: Story = withResume
+export const WithHiddenContent: Story = withHiddenContent
 
-export const WithResumeMobile: Story = combine(withResume, atViewport('mobile'))
+export const WithHiddenContentMobile: Story = combine(
+  withHiddenContent,
+  atViewport('mobile'),
+)
 
-export const WithResumeTablet: Story = combine(withResume, atViewport('tablet'))
+export const WithHiddenContentTablet: Story = combine(
+  withHiddenContent,
+  atViewport('tablet'),
+)
 
-export const WithResumeDark: Story = combine(
-  withResume,
+export const WithHiddenContentDark: Story = combine(
+  withHiddenContent,
   atViewport('desktop', { theme: 'dark' }),
 )
 
-export const WithResumeDarkMobile: Story = combine(
-  withResume,
+export const WithHiddenContentDarkMobile: Story = combine(
+  withHiddenContent,
   atViewport('mobile', { theme: 'dark' }),
 )
 
-export const WithResumeDarkTablet: Story = combine(
-  withResume,
+export const WithHiddenContentDarkTablet: Story = combine(
+  withHiddenContent,
   atViewport('tablet', { theme: 'dark' }),
 )
 

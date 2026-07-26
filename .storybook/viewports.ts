@@ -73,6 +73,25 @@ type StoryFields = {
   parameters?: Record<string, unknown>
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function deepMerge(
+  a: Record<string, unknown> = {},
+  b: Record<string, unknown> = {},
+): Record<string, unknown> {
+  const merged: Record<string, unknown> = { ...a }
+  for (const [key, value] of Object.entries(b)) {
+    const existing = merged[key]
+    merged[key] =
+      isPlainObject(existing) && isPlainObject(value)
+        ? deepMerge(existing, value)
+        : value
+  }
+  return merged
+}
+
 /**
  * Merge story fragments, combining their `globals` and `parameters` rather than
  * letting the last one win.
@@ -80,12 +99,17 @@ type StoryFields = {
  * Plain object spread is wrong for this: `{ ...aDarkStory, ...atViewport('mobile') }`
  * silently drops the first fragment's parameters, because both fragments carry
  * a `parameters` key and the second replaces it wholesale.
+ *
+ * The merge goes all the way down, matching how Storybook itself combines
+ * parameters. A shallow merge would have the same failure one level lower: a
+ * fragment setting `chromatic.disable` and another setting `chromatic.viewports`
+ * would keep only whichever came last.
  */
 export function combine(...fragments: StoryFields[]): StoryFields {
   return fragments.reduce<StoryFields>(
     (merged, fragment) => ({
-      globals: { ...merged.globals, ...fragment.globals },
-      parameters: { ...merged.parameters, ...fragment.parameters },
+      globals: deepMerge(merged.globals, fragment.globals),
+      parameters: deepMerge(merged.parameters, fragment.parameters),
     }),
     {},
   )
