@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { ContainerInner, ContainerOuter } from '@/components/Container'
 import { allNavItems } from 'content-collections'
 import { showHiddenContent } from '@/lib/showHiddenContent'
+import { getCurrentYear } from '@/lib/currentDate'
 
 function NavLink({
   href,
@@ -50,8 +51,7 @@ export function Footer() {
                 ))}
               </div>
               <p className="text-sm text-zinc-400 dark:text-zinc-500">
-                &copy; {new Date().getFullYear()} M. Scott Ford. All rights
-                reserved.
+                &copy; {getCurrentYear()} M. Scott Ford. All rights reserved.
               </p>
             </div>
           </ContainerInner>

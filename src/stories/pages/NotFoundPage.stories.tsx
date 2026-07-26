@@ -21,3 +21,15 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/**
+ * Every page renders the footer's copyright year, which the preview pins so
+ * snapshots don't drift when the year changes. This story overrides the pinned
+ * date to show that the seam works — the footer below should read 2030. It is
+ * the smallest page on the site, so it is the cheapest place to prove it.
+ */
+export const PinnedToADifferentYear: Story = {
+  parameters: {
+    mockDate: '2030-07-01T12:00:00Z',
+  },
+}

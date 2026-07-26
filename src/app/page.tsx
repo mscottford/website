@@ -21,6 +21,7 @@ import { ArrowDownIcon } from '@/components/icons/ArrowDownIcon'
 import { SocialLink } from '@/components/SocialLink'
 import { iconsByName } from '@/lib/icons'
 import { showHiddenContent } from '@/lib/showHiddenContent'
+import { getCurrentYear } from '@/lib/currentDate'
 import { SnippetContent } from '@/components/SnippetContent'
 
 function Article({ article }: { article: Post }) {
@@ -92,7 +93,7 @@ function Resume() {
       start: '2019',
       end: {
         label: 'Present',
-        dateTime: new Date().getFullYear().toString(),
+        dateTime: getCurrentYear().toString(),
       },
     },
     {

@@ -13,6 +13,7 @@ import { GitHubIcon } from '@/components/icons/GitHubIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
 import { MastodonIcon } from '@/components/icons/MastodonIcon'
 import { formatDate } from '@/lib/formatDate'
+import { getCurrentYear } from '@/lib/currentDate'
 import logoAirbnb from '@/images/logos/airbnb.svg'
 import logoFacebook from '@/images/logos/facebook.svg'
 import logoPlanetaria from '@/images/logos/planetaria.svg'
@@ -103,43 +104,43 @@ interface Role {
   title: string
   logo: ImageProps['src']
   start: string
-  end: string
+  end: { label: string; dateTime: string }
 }
 
-// Fixed end date rather than the current year, so the snapshot doesn't change
-// when the calendar rolls over.
-const resume: Role[] = [
-  {
-    company: 'Planetaria',
-    title: 'CEO',
-    logo: logoPlanetaria,
-    start: '2019',
-    end: 'Present',
-  },
-  {
-    company: 'Airbnb',
-    title: 'Product Designer',
-    logo: logoAirbnb,
-    start: '2014',
-    end: '2019',
-  },
-  {
-    company: 'Facebook',
-    title: 'iOS Software Engineer',
-    logo: logoFacebook,
-    start: '2011',
-    end: '2014',
-  },
-  {
-    company: 'Starbucks',
-    title: 'Shift Supervisor',
-    logo: logoStarbucks,
-    start: '2008',
-    end: '2011',
-  },
-]
-
 function Resume() {
+  // Built during render rather than at module scope, so the pinned date from
+  // the preview decorator is already in place.
+  const resume: Role[] = [
+    {
+      company: 'Planetaria',
+      title: 'CEO',
+      logo: logoPlanetaria,
+      start: '2019',
+      end: { label: 'Present', dateTime: getCurrentYear().toString() },
+    },
+    {
+      company: 'Airbnb',
+      title: 'Product Designer',
+      logo: logoAirbnb,
+      start: '2014',
+      end: { label: '2019', dateTime: '2019' },
+    },
+    {
+      company: 'Facebook',
+      title: 'iOS Software Engineer',
+      logo: logoFacebook,
+      start: '2011',
+      end: { label: '2014', dateTime: '2014' },
+    },
+    {
+      company: 'Starbucks',
+      title: 'Shift Supervisor',
+      logo: logoStarbucks,
+      start: '2008',
+      end: { label: '2011', dateTime: '2011' },
+    },
+  ]
+
   return (
     <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
       <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -164,11 +165,11 @@ function Resume() {
               <dt className="sr-only">Date</dt>
               <dd
                 className="ml-auto text-xs text-zinc-400 dark:text-zinc-500"
-                aria-label={`${role.start} until ${role.end}`}
+                aria-label={`${role.start} until ${role.end.label}`}
               >
                 <time dateTime={role.start}>{role.start}</time>{' '}
                 <span aria-hidden="true">—</span>{' '}
-                <time dateTime={role.end}>{role.end}</time>
+                <time dateTime={role.end.dateTime}>{role.end.label}</time>
               </dd>
             </dl>
           </li>
