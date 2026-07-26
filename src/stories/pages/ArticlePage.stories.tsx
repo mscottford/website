@@ -124,9 +124,18 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+// Every content variant is captured at all three viewports. Each variant's
+// mobile and tablet stories are composed from the variant itself, so the two
+// can't drift apart. See .storybook/viewports.ts for why each width was picked
+// and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')
+
 /**
  * Long titles wrap to multiple lines and push the body down; worth pinning so
- * the header spacing doesn't regress.
+ * the header spacing doesn't regress. Narrow viewports wrap it hardest, so the
+ * mobile story is the one that matters most here.
  */
 export const LongTitle: Story = {
   args: {
@@ -135,8 +144,12 @@ export const LongTitle: Story = {
   },
 }
 
-// The same page at the other two viewports. See .storybook/viewports.ts
-// for why each width was picked and how Chromatic captures it.
-export const Mobile: Story = atViewport('mobile')
+export const LongTitleMobile: Story = {
+  ...LongTitle,
+  ...atViewport('mobile'),
+}
 
-export const Tablet: Story = atViewport('tablet')
+export const LongTitleTablet: Story = {
+  ...LongTitle,
+  ...atViewport('tablet'),
+}

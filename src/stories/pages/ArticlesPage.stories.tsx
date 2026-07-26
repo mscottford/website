@@ -110,10 +110,28 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+// Every content variant is captured at all three viewports. Each variant's
+// mobile and tablet stories are composed from the variant itself, so the two
+// can't drift apart. See .storybook/viewports.ts for why each width was picked
+// and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')
+
 export const SingleArticle: Story = {
   args: {
     articles: [sampleArticles[0]],
   },
+}
+
+export const SingleArticleMobile: Story = {
+  ...SingleArticle,
+  ...atViewport('mobile'),
+}
+
+export const SingleArticleTablet: Story = {
+  ...SingleArticle,
+  ...atViewport('tablet'),
 }
 
 export const Empty: Story = {
@@ -134,8 +152,12 @@ export const Empty: Story = {
   ),
 }
 
-// The same page at the other two viewports. See .storybook/viewports.ts
-// for why each width was picked and how Chromatic captures it.
-export const Mobile: Story = atViewport('mobile')
+export const EmptyMobile: Story = {
+  ...Empty,
+  ...atViewport('mobile'),
+}
 
-export const Tablet: Story = atViewport('tablet')
+export const EmptyTablet: Story = {
+  ...Empty,
+  ...atViewport('tablet'),
+}

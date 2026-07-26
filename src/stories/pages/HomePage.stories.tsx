@@ -325,14 +325,33 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+// Every content variant is captured at all three viewports. Each variant's
+// mobile and tablet stories are composed from the variant itself, so the two
+// can't drift apart. See .storybook/viewports.ts for why each width was picked
+// and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')
+
 /**
  * The resume panel is only rendered in development, where it sits in a second
- * column beside the articles.
+ * column beside the articles. That second column is a `lg:` layout, so the
+ * mobile and tablet stories are where you see it stack instead.
  */
 export const WithResume: Story = {
   args: {
     showResume: true,
   },
+}
+
+export const WithResumeMobile: Story = {
+  ...WithResume,
+  ...atViewport('mobile'),
+}
+
+export const WithResumeTablet: Story = {
+  ...WithResume,
+  ...atViewport('tablet'),
 }
 
 export const NoArticles: Story = {
@@ -341,8 +360,12 @@ export const NoArticles: Story = {
   },
 }
 
-// The same page at the other two viewports. See .storybook/viewports.ts
-// for why each width was picked and how Chromatic captures it.
-export const Mobile: Story = atViewport('mobile')
+export const NoArticlesMobile: Story = {
+  ...NoArticles,
+  ...atViewport('mobile'),
+}
 
-export const Tablet: Story = atViewport('tablet')
+export const NoArticlesTablet: Story = {
+  ...NoArticles,
+  ...atViewport('tablet'),
+}

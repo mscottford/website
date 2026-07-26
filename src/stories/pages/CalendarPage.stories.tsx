@@ -84,6 +84,21 @@ export const Default: Story = {
   },
 }
 
+// Every content variant is captured at all three viewports. Each variant's
+// mobile and tablet stories are composed from the variant itself — which also
+// carries its args, so the booking state doesn't quietly fall back to the
+// unavailable one. See .storybook/viewports.ts for why each width was picked
+// and how Chromatic captures it.
+export const Mobile: Story = {
+  ...Default,
+  ...atViewport('mobile'),
+}
+
+export const Tablet: Story = {
+  ...Default,
+  ...atViewport('tablet'),
+}
+
 /**
  * The fallback shown when no booking URL is configured for the build — which
  * is the case for every preview and CI build.
@@ -94,14 +109,12 @@ export const Unavailable: Story = {
   },
 }
 
-// The same page at the other two viewports. See .storybook/viewports.ts
-// for why each width was picked and how Chromatic captures it.
-export const Mobile: Story = {
+export const UnavailableMobile: Story = {
+  ...Unavailable,
   ...atViewport('mobile'),
-  args: { bookingUrl: 'https://example.com/booking' },
 }
 
-export const Tablet: Story = {
+export const UnavailableTablet: Story = {
+  ...Unavailable,
   ...atViewport('tablet'),
-  args: { bookingUrl: 'https://example.com/booking' },
 }
