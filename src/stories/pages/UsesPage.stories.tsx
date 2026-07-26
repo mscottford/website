@@ -32,3 +32,9 @@ export const Default: Story = {}
 export const Mobile: Story = atViewport('mobile')
 
 export const Tablet: Story = atViewport('tablet')
+
+// Dark mode is applied by a decorator that adds the `dark` class to a wrapper,
+// so it lives in the rendered DOM and Chromatic captures it from the story
+// globals alone. One dark story per page covers the components that page
+// renders; see the note in .storybook/viewports.ts.
+export const Dark: Story = atViewport('desktop', { theme: 'dark' })

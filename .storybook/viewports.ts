@@ -41,18 +41,29 @@ function widthOf(viewport: PageViewport): number {
 }
 
 /**
- * Story (or meta) fields that render at one of the viewports above.
+ * Story (or meta) fields that render at one of the viewports above, optionally
+ * in the dark theme.
  *
- * Both halves are needed and they do different jobs. `globals.viewport` sizes
- * the preview pane so the story can be looked at in Storybook, while
- * `chromatic.viewports` sets the width Chromatic captures at — Chromatic does
- * not read the viewport addon's settings, so without the second half every
- * snapshot would come out at the same default width no matter what the
- * toolbar said.
+ * The viewport needs both halves, and they do different jobs.
+ * `globals.viewport` sizes the preview pane so the story can be looked at in
+ * Storybook, while `chromatic.viewports` sets the width Chromatic captures at —
+ * Chromatic does not read the viewport addon's settings, so without the second
+ * half every snapshot would come out at the same default width no matter what
+ * the toolbar said.
+ *
+ * The theme needs only the global. It is applied by a decorator that puts the
+ * `dark` class on a wrapper element, so it is part of the rendered DOM and
+ * Chromatic captures it without being told anything.
  */
-export function atViewport(viewport: PageViewport) {
+export function atViewport(
+  viewport: PageViewport,
+  { theme }: { theme?: 'light' | 'dark' } = {},
+) {
   return {
-    globals: { viewport: { value: viewport } },
+    globals: {
+      viewport: { value: viewport },
+      ...(theme ? { theme } : {}),
+    },
     parameters: { chromatic: { viewports: [widthOf(viewport)] } },
   }
 }
