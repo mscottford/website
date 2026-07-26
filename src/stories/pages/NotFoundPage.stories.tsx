@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import NotFound from '@/app/not-found'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
+import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
 
 /**
  * The 404 page, shown for any route that doesn't resolve. It is the only
@@ -12,7 +13,9 @@ const meta: Meta<typeof NotFound> = {
   component: NotFound,
   parameters: {
     layout: 'fullscreen',
+    ...defaultPageViewport.parameters,
   },
+  globals: defaultPageViewport.globals,
   tags: ['autodocs'],
   decorators: [withPageLayout],
 }
@@ -33,3 +36,9 @@ export const PinnedToADifferentYear: Story = {
     mockDate: '2030-07-01T12:00:00Z',
   },
 }
+
+// The same page at the other two viewports. See .storybook/viewports.ts
+// for why each width was picked and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')

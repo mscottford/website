@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/nextjs-vite'
 import { setCurrentDate } from '../src/lib/currentDate'
+import { pageViewports } from './viewports'
 import '../src/styles/tailwind.css'
 
 // The footer renders the current year, so without pinning the date every page
@@ -26,6 +27,9 @@ const preview: Preview = {
         { name: 'light', value: '#ffffff' },
         { name: 'dark', value: '#18181b' },
       ],
+    },
+    viewport: {
+      options: pageViewports,
     },
   },
   globalTypes: {

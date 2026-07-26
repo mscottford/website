@@ -7,6 +7,7 @@ import { InstagramIcon } from '@/components/icons/InstagramIcon'
 import { GitHubIcon } from '@/components/icons/GitHubIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
+import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
 
 function SocialLink({
   className,
@@ -114,7 +115,9 @@ const meta: Meta<typeof AboutPage> = {
   component: AboutPage,
   parameters: {
     layout: 'fullscreen',
+    ...defaultPageViewport.parameters,
   },
+  globals: defaultPageViewport.globals,
   tags: ['autodocs'],
   decorators: [withPageLayout],
 }
@@ -123,3 +126,9 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+// The same page at the other two viewports. See .storybook/viewports.ts
+// for why each width was picked and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')

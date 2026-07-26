@@ -24,6 +24,7 @@ import image3 from '@/images/photos/image-3.jpg'
 import image4 from '@/images/photos/image-4.jpg'
 import image5 from '@/images/photos/image-5.jpg'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
+import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
 
 interface Article {
   slug: string
@@ -312,7 +313,9 @@ const meta: Meta<typeof HomePage> = {
   component: HomePage,
   parameters: {
     layout: 'fullscreen',
+    ...defaultPageViewport.parameters,
   },
+  globals: defaultPageViewport.globals,
   tags: ['autodocs'],
   decorators: [withPageLayout],
 }
@@ -337,3 +340,9 @@ export const NoArticles: Story = {
     articles: [],
   },
 }
+
+// The same page at the other two viewports. See .storybook/viewports.ts
+// for why each width was picked and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')

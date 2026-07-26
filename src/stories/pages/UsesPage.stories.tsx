@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import Uses from '@/app/uses/page'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
+import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
 
 /**
  * The Uses page is a long, sectioned list of the hardware and software I
@@ -14,7 +15,9 @@ const meta: Meta<typeof Uses> = {
   component: Uses,
   parameters: {
     layout: 'fullscreen',
+    ...defaultPageViewport.parameters,
   },
+  globals: defaultPageViewport.globals,
   tags: ['autodocs'],
   decorators: [withPageLayout],
 }
@@ -23,3 +26,9 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+// The same page at the other two viewports. See .storybook/viewports.ts
+// for why each width was picked and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { SimpleLayout } from '@/components/SimpleLayout'
 import { Card } from '@/components/Card'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
+import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -97,7 +98,9 @@ const meta: Meta<typeof ArticlesPage> = {
   component: ArticlesPage,
   parameters: {
     layout: 'fullscreen',
+    ...defaultPageViewport.parameters,
   },
+  globals: defaultPageViewport.globals,
   tags: ['autodocs'],
   decorators: [withPageLayout],
 }
@@ -130,3 +133,9 @@ export const Empty: Story = {
     </SimpleLayout>
   ),
 }
+
+// The same page at the other two viewports. See .storybook/viewports.ts
+// for why each width was picked and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')

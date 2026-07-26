@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Container } from '@/components/Container'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
+import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
 
 // The real page embeds a third-party booking widget from
 // NEXT_PUBLIC_CALENDAR_BOOKING_URL. Pointing the story at that URL would make
@@ -64,7 +65,9 @@ const meta: Meta<typeof CalendarPage> = {
   component: CalendarPage,
   parameters: {
     layout: 'fullscreen',
+    ...defaultPageViewport.parameters,
   },
+  globals: defaultPageViewport.globals,
   tags: ['autodocs'],
   decorators: [withPageLayout],
 }
@@ -89,4 +92,16 @@ export const Unavailable: Story = {
   args: {
     bookingUrl: undefined,
   },
+}
+
+// The same page at the other two viewports. See .storybook/viewports.ts
+// for why each width was picked and how Chromatic captures it.
+export const Mobile: Story = {
+  ...atViewport('mobile'),
+  args: { bookingUrl: 'https://example.com/booking' },
+}
+
+export const Tablet: Story = {
+  ...atViewport('tablet'),
+  args: { bookingUrl: 'https://example.com/booking' },
 }

@@ -3,6 +3,7 @@ import { Container } from '@/components/Container'
 import { Prose } from '@/components/Prose'
 import { formatDate } from '@/lib/formatDate'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
+import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
 
 /**
  * A single article, combining the `[slug]` layout shell with the article
@@ -108,7 +109,9 @@ const meta: Meta<typeof ArticlePage> = {
   component: ArticlePage,
   parameters: {
     layout: 'fullscreen',
+    ...defaultPageViewport.parameters,
   },
+  globals: defaultPageViewport.globals,
   tags: ['autodocs'],
   decorators: [withPageLayout],
   args: {
@@ -131,3 +134,9 @@ export const LongTitle: Story = {
       'What Twenty Years of Maintaining Other People’s Code Taught Me About Writing My Own',
   },
 }
+
+// The same page at the other two viewports. See .storybook/viewports.ts
+// for why each width was picked and how Chromatic captures it.
+export const Mobile: Story = atViewport('mobile')
+
+export const Tablet: Story = atViewport('tablet')
