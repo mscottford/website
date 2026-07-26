@@ -68,6 +68,29 @@ export function atViewport(
   }
 }
 
+type StoryFields = {
+  globals?: Record<string, unknown>
+  parameters?: Record<string, unknown>
+}
+
+/**
+ * Merge story fragments, combining their `globals` and `parameters` rather than
+ * letting the last one win.
+ *
+ * Plain object spread is wrong for this: `{ ...aDarkStory, ...atViewport('mobile') }`
+ * silently drops the first fragment's parameters, because both fragments carry
+ * a `parameters` key and the second replaces it wholesale.
+ */
+export function combine(...fragments: StoryFields[]): StoryFields {
+  return fragments.reduce<StoryFields>(
+    (merged, fragment) => ({
+      globals: { ...merged.globals, ...fragment.globals },
+      parameters: { ...merged.parameters, ...fragment.parameters },
+    }),
+    {},
+  )
+}
+
 /**
  * The viewport a page meta defaults to, so every story on the page is captured
  * at a known width rather than whatever Chromatic happens to default to.
