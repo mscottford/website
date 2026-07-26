@@ -63,10 +63,24 @@ const preview: Preview = {
       setCurrentDate(new Date(context.parameters.mockDate ?? STORY_DATE))
       return <Story />
     },
+    // The background is written as a `dark:` variant rather than picked here,
+    // so that it follows the theme however dark was arrived at. A story can ask
+    // for dark through the global, which puts `dark` on this wrapper, or the
+    // theme toggle can be clicked, which puts it on the document element. The
+    // second case used to leave a hardcoded `bg-white` behind dark text: the
+    // page looked right, because the layout paints its own background over the
+    // top, but anything reading the DOM saw pale text on white, and the
+    // accessibility checks reported contrast failures on every element.
     (Story, context) => {
       const theme = context.globals.theme || 'light'
       return (
-        <div className={theme === 'dark' ? 'dark bg-zinc-900' : 'bg-white'}>
+        <div
+          className={
+            theme === 'dark'
+              ? 'dark bg-white dark:bg-zinc-900'
+              : 'bg-white dark:bg-zinc-900'
+          }
+        >
           <Story />
         </div>
       )

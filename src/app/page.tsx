@@ -72,7 +72,7 @@ function Role({ role }: { role: Role }) {
         </dd>
         <dt className="sr-only">Date</dt>
         <dd
-          className="ml-auto text-xs text-zinc-400 dark:text-zinc-500"
+          className="ml-auto text-xs text-zinc-500 dark:text-zinc-400"
           aria-label={`${startLabel} until ${endLabel}`}
         >
           <time dateTime={startDate}>{startLabel}</time>{' '}
@@ -223,7 +223,7 @@ export default async function Home() {
             ))}
             <Link
               href="/articles"
-              className="flex items-center text-sm font-medium text-teal-500"
+              className="flex items-center text-sm font-medium text-teal-700 dark:text-teal-500"
             >
               Read more articles
               <svg

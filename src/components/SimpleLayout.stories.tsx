@@ -39,17 +39,17 @@ export const WithChildren: Story = {
     children: (
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <div className="rounded-lg bg-zinc-50 p-6 dark:bg-zinc-800/50">
-          <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+          <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
             Project One
-          </h3>
+          </h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             A brief description of the first project.
           </p>
         </div>
         <div className="rounded-lg bg-zinc-50 p-6 dark:bg-zinc-800/50">
-          <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+          <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
             Project Two
-          </h3>
+          </h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             A brief description of the second project.
           </p>
@@ -67,17 +67,17 @@ export const ArticlesPage: Story = {
     children: (
       <div className="space-y-8">
         <article>
-          <h3 className="text-base font-semibold text-zinc-800 dark:text-zinc-100">
+          <h2 className="text-base font-semibold text-zinc-800 dark:text-zinc-100">
             Building Modern Web Applications
-          </h3>
+          </h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             An exploration of modern web development practices and tools.
           </p>
         </article>
         <article>
-          <h3 className="text-base font-semibold text-zinc-800 dark:text-zinc-100">
+          <h2 className="text-base font-semibold text-zinc-800 dark:text-zinc-100">
             The Future of TypeScript
-          </h3>
+          </h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Thoughts on where TypeScript is headed and what it means for
             developers.

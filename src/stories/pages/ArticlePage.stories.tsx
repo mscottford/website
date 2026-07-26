@@ -35,7 +35,7 @@ function ArticlePage({
               </h1>
               <time
                 dateTime={createdAt}
-                className="order-first flex items-center text-base text-zinc-400 dark:text-zinc-500"
+                className="order-first flex items-center text-base text-zinc-500 dark:text-zinc-400"
               >
                 <span className="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500" />
                 <span className="ml-3">{formatDate(createdAt)}</span>
@@ -81,7 +81,9 @@ function SampleContent() {
         <em>should</em> do. It asserts what it <strong>currently</strong> does,
         which is a very different and much more achievable goal:
       </p>
-      <pre>
+      {/* Matches what the site's MDX now renders; see mdx-components.tsx. */}
+      {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <pre tabIndex={0}>
         <code>{`test('returns the legacy shape', () => {
   expect(render(order)).toEqual(snapshotOfTodaysBehaviour)
 })`}</code>
