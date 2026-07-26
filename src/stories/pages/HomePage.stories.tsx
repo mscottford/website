@@ -25,6 +25,7 @@ import image4 from '@/images/photos/image-4.jpg'
 import image5 from '@/images/photos/image-5.jpg'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
 import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
+import { togglesToDarkTheme } from '../../../.storybook/interactions'
 
 interface Article {
   slug: string
@@ -335,9 +336,17 @@ export const Tablet: Story = atViewport('tablet')
 
 // Dark mode is applied by a decorator that adds the `dark` class to a wrapper,
 // so it lives in the rendered DOM and Chromatic captures it from the story
-// globals alone. One dark story per page covers the components that page
-// renders; see the note in .storybook/viewports.ts.
+// globals alone. See the note in .storybook/viewports.ts.
 export const Dark: Story = atViewport('desktop', { theme: 'dark' })
+
+export const DarkMobile: Story = atViewport('mobile', { theme: 'dark' })
+
+export const DarkTablet: Story = atViewport('tablet', { theme: 'dark' })
+
+// Clicks the header toggle and checks the page switches to dark.
+export const ThemeToggle: Story = {
+  play: togglesToDarkTheme,
+}
 
 /**
  * The resume panel is only rendered in development, where it sits in a second
@@ -360,6 +369,21 @@ export const WithResumeTablet: Story = {
   ...atViewport('tablet'),
 }
 
+export const WithResumeDark: Story = {
+  ...WithResume,
+  ...atViewport('desktop', { theme: 'dark' }),
+}
+
+export const WithResumeDarkMobile: Story = {
+  ...WithResume,
+  ...atViewport('mobile', { theme: 'dark' }),
+}
+
+export const WithResumeDarkTablet: Story = {
+  ...WithResume,
+  ...atViewport('tablet', { theme: 'dark' }),
+}
+
 export const NoArticles: Story = {
   args: {
     articles: [],
@@ -374,4 +398,19 @@ export const NoArticlesMobile: Story = {
 export const NoArticlesTablet: Story = {
   ...NoArticles,
   ...atViewport('tablet'),
+}
+
+export const NoArticlesDark: Story = {
+  ...NoArticles,
+  ...atViewport('desktop', { theme: 'dark' }),
+}
+
+export const NoArticlesDarkMobile: Story = {
+  ...NoArticles,
+  ...atViewport('mobile', { theme: 'dark' }),
+}
+
+export const NoArticlesDarkTablet: Story = {
+  ...NoArticles,
+  ...atViewport('tablet', { theme: 'dark' }),
 }

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Container } from '@/components/Container'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
 import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
+import { togglesToDarkTheme } from '../../../.storybook/interactions'
 
 // The real page embeds a third-party booking widget from
 // NEXT_PUBLIC_CALENDAR_BOOKING_URL. Pointing the story at that URL would make
@@ -101,11 +102,26 @@ export const Tablet: Story = {
 
 // Dark mode is applied by a decorator that adds the `dark` class to a wrapper,
 // so it lives in the rendered DOM and Chromatic captures it from the story
-// globals alone. One dark story per page covers the components that page
-// renders; see the note in .storybook/viewports.ts.
+// globals alone. See the note in .storybook/viewports.ts.
 export const Dark: Story = {
   ...Default,
   ...atViewport('desktop', { theme: 'dark' }),
+}
+
+export const DarkMobile: Story = {
+  ...Default,
+  ...atViewport('mobile', { theme: 'dark' }),
+}
+
+export const DarkTablet: Story = {
+  ...Default,
+  ...atViewport('tablet', { theme: 'dark' }),
+}
+
+// Clicks the header toggle and checks the page switches to dark.
+export const ThemeToggle: Story = {
+  ...Default,
+  play: togglesToDarkTheme,
 }
 
 /**
@@ -126,4 +142,19 @@ export const UnavailableMobile: Story = {
 export const UnavailableTablet: Story = {
   ...Unavailable,
   ...atViewport('tablet'),
+}
+
+export const UnavailableDark: Story = {
+  ...Unavailable,
+  ...atViewport('desktop', { theme: 'dark' }),
+}
+
+export const UnavailableDarkMobile: Story = {
+  ...Unavailable,
+  ...atViewport('mobile', { theme: 'dark' }),
+}
+
+export const UnavailableDarkTablet: Story = {
+  ...Unavailable,
+  ...atViewport('tablet', { theme: 'dark' }),
 }

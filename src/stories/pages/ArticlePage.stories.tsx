@@ -4,6 +4,7 @@ import { Prose } from '@/components/Prose'
 import { formatDate } from '@/lib/formatDate'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
 import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
+import { togglesToDarkTheme } from '../../../.storybook/interactions'
 
 /**
  * A single article, combining the `[slug]` layout shell with the article
@@ -134,9 +135,17 @@ export const Tablet: Story = atViewport('tablet')
 
 // Dark mode is applied by a decorator that adds the `dark` class to a wrapper,
 // so it lives in the rendered DOM and Chromatic captures it from the story
-// globals alone. One dark story per page covers the components that page
-// renders; see the note in .storybook/viewports.ts.
+// globals alone. See the note in .storybook/viewports.ts.
 export const Dark: Story = atViewport('desktop', { theme: 'dark' })
+
+export const DarkMobile: Story = atViewport('mobile', { theme: 'dark' })
+
+export const DarkTablet: Story = atViewport('tablet', { theme: 'dark' })
+
+// Clicks the header toggle and checks the page switches to dark.
+export const ThemeToggle: Story = {
+  play: togglesToDarkTheme,
+}
 
 /**
  * Long titles wrap to multiple lines and push the body down; worth pinning so
@@ -158,4 +167,19 @@ export const LongTitleMobile: Story = {
 export const LongTitleTablet: Story = {
   ...LongTitle,
   ...atViewport('tablet'),
+}
+
+export const LongTitleDark: Story = {
+  ...LongTitle,
+  ...atViewport('desktop', { theme: 'dark' }),
+}
+
+export const LongTitleDarkMobile: Story = {
+  ...LongTitle,
+  ...atViewport('mobile', { theme: 'dark' }),
+}
+
+export const LongTitleDarkTablet: Story = {
+  ...LongTitle,
+  ...atViewport('tablet', { theme: 'dark' }),
 }

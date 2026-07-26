@@ -8,6 +8,7 @@ import { GitHubIcon } from '@/components/icons/GitHubIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
 import { withPageLayout } from '../../../.storybook/decorators/withPageLayout'
 import { atViewport, defaultPageViewport } from '../../../.storybook/viewports'
+import { togglesToDarkTheme } from '../../../.storybook/interactions'
 
 function SocialLink({
   className,
@@ -138,3 +139,12 @@ export const Tablet: Story = atViewport('tablet')
 // globals alone. One dark story per page covers the components that page
 // renders; see the note in .storybook/viewports.ts.
 export const Dark: Story = atViewport('desktop', { theme: 'dark' })
+
+export const DarkMobile: Story = atViewport('mobile', { theme: 'dark' })
+
+export const DarkTablet: Story = atViewport('tablet', { theme: 'dark' })
+
+// Clicks the header toggle and checks the page switches to dark.
+export const ThemeToggle: Story = {
+  play: togglesToDarkTheme,
+}

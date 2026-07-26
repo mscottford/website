@@ -48,6 +48,14 @@ const preview: Preview = {
       },
     },
   },
+  // The theme-toggle interaction stories click the toggle, and next-themes
+  // remembers that choice in localStorage and on the document element. Both
+  // outlive the story, so without clearing them every story rendered afterwards
+  // in the same browser session would come out dark.
+  beforeEach: async () => {
+    window.localStorage.removeItem('theme')
+    document.documentElement.classList.remove('dark')
+  },
   decorators: [
     // Runs before the story renders, so a story can pin its own date with
     // `parameters: { mockDate: '2030-01-01T12:00:00Z' }`.
