@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename)
 
 const configuration: FaviconOptions = {
   path: '/', // Path for overriding default icons path. `string`
-  background: '#fff', // Background colour for flattened icons. `string`
+  background: '#fff', // Background color for flattened icons. `string`
   appleStatusBarStyle: 'black-translucent', // Style for Apple status bar: "black-translucent", "default", "black". `string`
   display: 'standalone', // Preferred display mode: "fullscreen", "standalone", "minimal-ui" or "browser". `string`
   orientation: 'any', // Default orientation: "any", "natural", "portrait" or "landscape". `string`

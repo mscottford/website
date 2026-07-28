@@ -1,0 +1,50 @@
+name: Chromatic
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: chromatic-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  chromatic:
+    name: Visual regression tests
+    # Pull requests from forks receive no secrets, so the project token would be
+    # empty and Chromatic would fail. Skip rather than fail the check.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Chromatic reads git history to find each build's ancestor and to let
+          # TurboSnap diff against it. At the default depth of 1 every build
+          # looks unrelated and every story is rebaselined.
+          fetch-depth: 0
+
+      # No version here on purpose - package.json's packageManager field pins
+      # it, and specifying both makes the action fail on the mismatch.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          buildScriptName: build-storybook
+          # Review UI changes in Chromatic rather than blocking the PR check on
+          # them; only genuine build errors should fail this job.
+          exitZeroOnChanges: true
+          autoAcceptChanges: main
+          onlyChanged: true
