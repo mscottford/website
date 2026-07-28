@@ -63,7 +63,7 @@ function SampleContent() {
       <p>
         Every system has a boundary where it talks to the outside world: HTTP
         handlers, message consumers, cron entrypoints. Those are the places
-        where behaviour is easiest to describe, because you can state what goes
+        where behavior is easiest to describe, because you can state what goes
         in and what comes out without understanding anything in between.
       </p>
       <ul>
@@ -85,7 +85,7 @@ function SampleContent() {
       {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
       <pre tabIndex={0}>
         <code>{`test('returns the legacy shape', () => {
-  expect(render(order)).toEqual(snapshotOfTodaysBehaviour)
+  expect(render(order)).toEqual(snapshotOfTodaysBehavior)
 })`}</code>
       </pre>
       <p>
@@ -99,7 +99,7 @@ function SampleContent() {
         </p>
       </blockquote>
       <p>
-        Once the behaviour is pinned down, the rest is ordinary work: rename
+        Once the behavior is pinned down, the rest is ordinary work: rename
         things, extract the pieces you understand, and let the test tell you
         when you&apos;ve gone too far.
       </p>

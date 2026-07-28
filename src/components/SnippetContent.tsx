@@ -43,10 +43,10 @@ export function SnippetContent({ name }: SnippetContentProps) {
         }
         return (
           // Underlined, not just tinted. These links sit inside a paragraph,
-          // and until now they inherited the paragraph's colour and weight
+          // and until now they inherited the paragraph's color and weight
           // exactly, so there was nothing at all to show they were links.
-          // Colour alone would not be enough anyway — telling a link apart from
-          // its surrounding text has to survive not being able to see colour.
+          // Color alone would not be enough anyway — telling a link apart from
+          // its surrounding text has to survive not being able to see color.
           <Link
             key={index}
             href={part.href}

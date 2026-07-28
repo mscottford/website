@@ -6,7 +6,7 @@ import { togglesToDarkTheme } from '../../../.storybook/interactions'
 
 /**
  * The 404 page, shown for any route that doesn't resolve. It is the only
- * page that centres its content vertically, so it is worth snapshotting to
+ * page that centers its content vertically, so it is worth snapshotting to
  * catch layout regressions in the surrounding shell.
  */
 const meta: Meta<typeof NotFound> = {

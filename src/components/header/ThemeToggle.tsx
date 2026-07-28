@@ -18,7 +18,7 @@ export function ThemeToggle() {
   // for". It used to be spelled as a `prefers-color-scheme` media query, which
   // asked the operating system directly instead of asking the theme we are
   // actually rendering. That was wrong in any context where the provider isn't
-  // following the OS — with system detection off the icon still coloured itself
+  // following the OS — with system detection off the icon still colored itself
   // as though the OS had a say — and it made the accent impossible to render
   // deterministically, since it depended on the machine doing the rendering.
   // Comparing the two values next-themes already hands us says the same thing

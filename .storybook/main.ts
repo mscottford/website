@@ -15,7 +15,7 @@ const mockShowHiddenContent = here('./mocks/showHiddenContent.ts')
 /**
  * Redirects the two modules that decide what a page contains to stand-ins, so
  * a story can render a real page component with content it controls instead of
- * reimplementing the page. Both stand-ins default to the real behaviour, so
+ * reimplementing the page. Both stand-ins default to the real behavior, so
  * this only changes anything where a story asks it to. See ./mocks.
  *
  * Two things make this fiddlier than a `resolve.alias` entry would suggest.
