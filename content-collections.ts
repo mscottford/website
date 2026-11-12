@@ -99,5 +99,5 @@ const snippets = defineCollection({
 })
 
 export default defineConfig({
-  collections: [posts, socialLinks, navItems, snippets],
+  content: [posts, socialLinks, navItems, snippets],
 })

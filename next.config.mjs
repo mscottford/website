@@ -1,10 +1,5 @@
 import { withContentCollections } from '@content-collections/next'
-import rehypePrism from '@mapbox/rehype-prism'
 import nextMDX from '@next/mdx'
-import remarkFrontmatter from 'remark-frontmatter'
-import remarkGfm from 'remark-gfm'
-import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
-import remarkPostImages from './scripts/remark-post-images.ts'
 
 const __dirname = new URL('.', import.meta.url).pathname
 
@@ -34,16 +29,18 @@ const nextConfig = {
   outputFileTracingRoot: __dirname,
 }
 
+// Turbopack passes loader options across a process boundary, so plugins must
+// be named by module specifier rather than imported as functions.
 const withMDX = nextMDX({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [
-      remarkGfm,
-      remarkFrontmatter,
-      remarkMdxFrontmatter,
-      remarkPostImages,
+      'remark-gfm',
+      'remark-frontmatter',
+      'remark-mdx-frontmatter',
+      `${__dirname}scripts/remark-post-images.ts`,
     ],
-    rehypePlugins: [rehypePrism],
+    rehypePlugins: ['@mapbox/rehype-prism'],
   },
 })
 
