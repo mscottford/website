@@ -1,5 +1,6 @@
 import { allPosts } from 'content-collections'
 import { Feed } from 'feed'
+import { getCurrentYear } from '@/lib/currentDate'
 
 export const dynamic = 'force-static'
 
@@ -25,7 +26,7 @@ export async function GET() {
     link: siteUrl,
     image: `${siteUrl}/favicon.ico`,
     favicon: `${siteUrl}/favicon.ico`,
-    copyright: `All rights reserved ${new Date().getFullYear()}`,
+    copyright: `All rights reserved ${getCurrentYear()}`,
     feedLinks: {
       atom1: `${siteUrl}/feed.xml`,
     },

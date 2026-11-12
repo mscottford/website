@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { ContainerInner, ContainerOuter } from '@/components/Container'
 import { allNavItems } from 'content-collections'
 import { showHiddenContent } from '@/lib/showHiddenContent'
+import { getCurrentYear } from '@/lib/currentDate'
 
 function NavLink({
   href,
@@ -18,7 +19,7 @@ function NavLink({
     <Link
       href={href}
       className={clsx(
-        'transition hover:text-teal-500 dark:hover:text-teal-400',
+        'transition hover:text-teal-700 dark:hover:text-teal-400',
         outlined && 'outline-1 outline-dashed outline-purple-500 rounded',
       )}
     >
@@ -49,9 +50,8 @@ export function Footer() {
                   </NavLink>
                 ))}
               </div>
-              <p className="text-sm text-zinc-400 dark:text-zinc-500">
-                &copy; {new Date().getFullYear()} M. Scott Ford. All rights
-                reserved.
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                &copy; {getCurrentYear()} M. Scott Ford. All rights reserved.
               </p>
             </div>
           </ContainerInner>

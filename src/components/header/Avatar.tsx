@@ -1,7 +1,12 @@
 import Link from 'next/link'
 import clsx from 'clsx'
 import Image from 'next/image'
-import avatarImage from '@/images/avatar.jpg'
+// A copy sized for the 36px it renders at, rather than `avatar.jpg`, which is
+// the 1379px master kept for generating the favicons. Static export runs with
+// `images: { unoptimized: true }`, so next/image ships whatever it is given at
+// full size — the master meant 1.25MB fetched on every page of the site to
+// draw this circle.
+import avatarImage from '@/images/avatar-header.jpg'
 
 export function Avatar({
   label = undefined,
@@ -25,7 +30,7 @@ export function Avatar({
         priority
       />
       {label && (
-        <span className="mr-2.5 bg-white/90 px-3 py-2 text-sm font-medium text-zinc-800 hover:text-teal-500 dark:bg-zinc-800/90 dark:text-zinc-200 dark:hover:text-teal-400">
+        <span className="mr-2.5 bg-white/90 px-3 py-2 text-sm font-medium text-zinc-800 hover:text-teal-700 dark:bg-zinc-800/90 dark:text-zinc-200 dark:hover:text-teal-400">
           M. Scott Ford
         </span>
       )}
