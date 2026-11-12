@@ -50,7 +50,7 @@ function parseArgs(): {
   const bucket = args[0]
   if (!bucket || bucket.startsWith('--')) {
     console.error(
-      'Usage: ts-node rollback-deployment.ts <bucket-name> [--versions-back N] [--dry-run]',
+      'Usage: node scripts/rollback-deployment.ts <bucket-name> [--versions-back N] [--dry-run]',
     )
     console.error('')
     console.error('Use the npm scripts instead:')

@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node --esm
+#!/usr/bin/env node
 
 /**
  * RSS Feed Migration Test Script
@@ -162,7 +162,7 @@ async function main() {
 
   if (args.length < 2) {
     console.error(
-      'Usage: ts-node --esm scripts/test-rss-feed.ts <baseline-url> <new-url> [--cutoff-days=N]',
+      'Usage: node scripts/test-rss-feed.ts <baseline-url> <new-url> [--cutoff-days=N]',
     )
     console.error('')
     console.error('Arguments:')
@@ -174,7 +174,7 @@ async function main() {
     console.error('')
     console.error('Example:')
     console.error(
-      '  ts-node --esm scripts/test-rss-feed.ts https://mscottford.com/feed.xml https://staging.mscottford.com/feed.xml',
+      '  node scripts/test-rss-feed.ts https://mscottford.com/feed.xml https://staging.mscottford.com/feed.xml',
     )
     process.exit(2)
   }

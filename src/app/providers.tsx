@@ -1,17 +1,22 @@
 'use client'
 
-import { createContext, useEffect, useRef } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { ThemeProvider, useTheme } from 'next-themes'
 
+// Tracks the last value that differs from the current one. Stored in state and
+// updated during render (React's documented pattern) rather than read from a
+// ref during render, which React forbids because it can render stale values.
 function usePrevious<T>(value: T) {
-  const ref = useRef<T | undefined>(undefined)
+  const [current, setCurrent] = useState(value)
+  const [previous, setPrevious] = useState<T | undefined>(undefined)
 
-  useEffect(() => {
-    ref.current = value
-  }, [value])
+  if (value !== current) {
+    setPrevious(current)
+    setCurrent(value)
+  }
 
-  return ref.current
+  return previous
 }
 
 function ThemeWatcher() {

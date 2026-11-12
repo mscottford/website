@@ -1,11 +1,11 @@
 /**
  * Tests S3 routing rules against a live URL to verify redirects work correctly.
  *
- * Usage: pnpm exec ts-node --esm scripts/test-redirects.ts <base-url>
+ * Usage: node scripts/test-redirects.ts <base-url>
  *
  * Example:
- *   pnpm exec ts-node --esm scripts/test-redirects.ts https://staging.mscottford.com
- *   pnpm exec ts-node --esm scripts/test-redirects.ts https://mscottford.com
+ *   node scripts/test-redirects.ts https://staging.mscottford.com
+ *   node scripts/test-redirects.ts https://mscottford.com
  */
 
 import * as fs from 'node:fs'
@@ -93,13 +93,11 @@ async function main() {
   const baseUrl = process.argv[2]
 
   if (!baseUrl) {
-    console.error(
-      'Usage: pnpm exec ts-node --esm scripts/test-redirects.ts <base-url>',
-    )
+    console.error('Usage: node scripts/test-redirects.ts <base-url>')
     console.error('')
     console.error('Example:')
     console.error(
-      '  pnpm exec ts-node --esm scripts/test-redirects.ts https://staging.mscottford.com',
+      '  node scripts/test-redirects.ts https://staging.mscottford.com',
     )
     process.exit(1)
   }

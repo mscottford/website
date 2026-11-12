@@ -1,18 +1,25 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import clsx from 'clsx'
 import { MoonIcon, SunIcon } from '@/components/icons'
+
+function subscribeToNothing() {
+  return () => {}
+}
 
 export function ThemeToggle() {
   const { resolvedTheme, systemTheme, setTheme } = useTheme()
   const otherTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // false during server rendering and hydration, true once on the client, so
+  // the first client render matches the server HTML. Avoids a setState in an
+  // effect, which would force a second render just to flip this flag.
+  const mounted = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false,
+  )
 
   // The teal accent means "what you're looking at isn't what your OS asked
   // for". It used to be spelled as a `prefers-color-scheme` media query, which
