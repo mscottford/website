@@ -5,6 +5,12 @@ import { z } from 'zod'
 
 const exec = util.promisify(child_process.exec)
 
+function omit<T extends object, K extends keyof T>(value: T, key: K) {
+  const copy = { ...value }
+  delete copy[key]
+  return copy as Omit<T, K>
+}
+
 const posts = defineCollection({
   name: 'posts',
   directory: './content/posts',
@@ -17,7 +23,11 @@ const posts = defineCollection({
     tumblrId: z.string().optional(),
     tumblrSlug: z.string().optional(),
   }),
-  transform: async ({ content, ...post }, { cache }) => {
+  transform: async (document, { cache }) => {
+    // Pages render posts by importing the MDX directly, so the raw source would
+    // only bloat the generated data every page imports.
+    const post = omit(document, 'content')
+
     const lastModifiedAt = await cache(
       post._meta.filePath,
       async (filePath) => {
