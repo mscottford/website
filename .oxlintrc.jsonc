@@ -18,7 +18,10 @@
     "browser": true,
     "node": true,
   },
-  "rules": {},
+  "rules": {
+    // Allow `const { omitted, ...rest } = obj` to drop a property.
+    "eslint/no-unused-vars": ["error", { "ignoreRestSiblings": true }],
+  },
   "ignorePatterns": [
     ".next",
     "out",

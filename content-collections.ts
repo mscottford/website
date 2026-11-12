@@ -17,7 +17,7 @@ const posts = defineCollection({
     tumblrId: z.string().optional(),
     tumblrSlug: z.string().optional(),
   }),
-  transform: async ({ content: _, ...post }, { cache }) => {
+  transform: async ({ content, ...post }, { cache }) => {
     const lastModifiedAt = await cache(
       post._meta.filePath,
       async (filePath) => {
