@@ -37,7 +37,7 @@ function parseArgs(): { bucket: string; follow: boolean; lines: number } {
   const bucket = args[0]
   if (!bucket || bucket.startsWith('-')) {
     console.error(
-      'Usage: ts-node tail-access-logs.ts <bucket-name> [--follow] [--lines N]',
+      'Usage: node scripts/tail-access-logs.ts <bucket-name> [--follow] [--lines N]',
     )
     console.error('')
     console.error('Use the npm scripts instead:')

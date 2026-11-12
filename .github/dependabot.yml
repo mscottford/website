@@ -24,10 +24,6 @@ updates:
           - minor
           - patch
     ignore:
-      # TypeScript 7 drops the compiler JavaScript API that ts-node, Next's
-      # build-time type check and Storybook's docgen rely on.
-      - dependency-name: typescript
-        update-types: ['version-update:semver-major']
       # Keep Node's types on the same major as the Node version CI and
       # deploys run (node-version in .github/workflows).
       - dependency-name: '@types/node'

@@ -1,7 +1,7 @@
 /**
  * Generates redirect configuration for CloudFront Function.
  *
- * Usage: pnpm exec ts-node --esm scripts/generate-s3-redirects.ts
+ * Usage: node scripts/generate-s3-redirects.ts
  *
  * Outputs:
  *   - deploy/terraform/cloudfront-redirects.js (CloudFront Function code)
