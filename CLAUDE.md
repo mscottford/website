@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Personal website and blog for M. Scott Ford (mscottford.com) built with Next.js 15 App Router, React 19, and TypeScript. The site is statically exported and deployed to S3 + CloudFront.
+Personal website and blog for M. Scott Ford (mscottford.com) built with Next.js 16 App Router, React 19, and TypeScript. The site is statically exported and deployed to S3 + CloudFront.
 
 ## Commands
 

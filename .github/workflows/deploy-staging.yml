@@ -37,7 +37,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v9
         env:
           SITE_URL: ${{ needs.deploy.outputs.site_url }}
         with:
